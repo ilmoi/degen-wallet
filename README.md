@@ -1,5 +1,5 @@
 Degen wallet
-
+```
                  __,__
         .--.  .-"     "-.  .--.
        / .. \/  .-. .-.  \/ .. \
@@ -27,6 +27,7 @@ jgs  ___>     '.       \_ _ _/   ,  '--.
             \ '....' |
              '.,___.'
 
+```
 No idea what this will become... other than that I'm using it to: 
 1. Build a wallet
 2. Do it for both eth and sol
