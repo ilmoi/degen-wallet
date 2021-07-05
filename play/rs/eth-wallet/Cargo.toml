@@ -1,0 +1,25 @@
+[package]
+name = "eth-wallet-manual"
+version = "0.1.0"
+authors = ["ilmoi <iljamoi@protonmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# general
+serde = { version="1.0.126", features=["derive"] }
+hex = "0.4.3"
+rand = { version="0.7"} # need 0.7 for eth-keystore to work ok. Might change in future versions ofc.
+
+# low level crypto
+hmac-sha256 = "0.1.7"
+
+# high level crypto
+eth-keystore = "0.2.1"
+tiny-bip39 = "0.8.0"
+hdpath = { version="0.6.0", features=["with-bitcoin"] }
+secp256k1 = "0.20.3"
+bitcoin = "0.26.2"
+sha3 = "0.9.1"
+eth_checksum = "0.1.2"

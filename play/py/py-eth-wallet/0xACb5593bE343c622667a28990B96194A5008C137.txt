@@ -1,0 +1,1 @@
+{"salt": "f4b7632edb6bb0dff29bcbe14fcdee4b", "initialization vector": "9e27143270e267a735aac78fba4f4cee", "encrypted private key": "47613ec01f3934eb000c43a604bd4c5f752c648bba9e7d659916bb18d59d68ccc3a88d4defe2d0fd4ff4d55faf176d0f43f0071e8e24cb0d0d6cec5b1f1c0ece3d01bac334beb9d078c3185723ce09a6"}
