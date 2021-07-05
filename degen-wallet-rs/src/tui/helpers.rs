@@ -1,15 +1,14 @@
-use crate::tui::util::{StatefulList, TabsState};
 use std::io::Stdout;
-use std::{error::Error, io, thread};
+use std::{error::Error, io};
+
 use termion::raw::RawTerminal;
-use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tui::widgets::{List, ListItem, Tabs};
+use termion::{raw::IntoRawMode, screen::AlternateScreen};
 use tui::{
     backend::TermionBackend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    style::{Modifier, Style},
     text::{Span, Spans},
-    widgets::{Block, Borders, Clear, Paragraph, Wrap},
+    widgets::{Block, Borders, Paragraph},
     Frame, Terminal,
 };
 
@@ -20,7 +19,7 @@ pub fn init_terminal() -> Result<Terminal<TermBck>, Box<dyn Error>> {
     // let stdout = MouseTerminal::from(stdout);
     let stdout = AlternateScreen::from(stdout);
     let backend = TermionBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
+    let terminal = Terminal::new(backend)?;
     Ok(terminal)
 }
 
@@ -118,20 +117,4 @@ pub fn centered_rect_fixed(fixed_x: u16, fixed_y: u16, r: Rect) -> Rect {
             .as_ref(),
         )
         .split(popup_layout[1])[1]
-}
-
-pub struct TabsApp<'a> {
-    pub tabs: TabsState<'a>,
-}
-
-pub struct ListApp<'a> {
-    pub items: StatefulList<&'a str>,
-}
-
-impl<'a> ListApp<'a> {
-    pub fn new(items: Vec<&'a str>) -> ListApp<'a> {
-        Self {
-            items: StatefulList::with_items(items),
-        }
-    }
 }

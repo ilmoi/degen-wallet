@@ -1,26 +1,15 @@
 use std::collections::HashMap;
-use std::io::Stdout;
-use std::{error::Error, io, thread};
 
 use bip39::Mnemonic;
-use termion::raw::RawTerminal;
-use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tui::widgets::{List, ListItem, Tabs};
-use tui::{
-    backend::TermionBackend,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
-    text::{Span, Spans},
-    widgets::{Block, Borders, Clear, Paragraph, Wrap},
-    Frame, Terminal,
-};
+use termion::event::Key;
+use tui::layout::Rect;
+use tui::widgets::Block;
+use tui::Frame;
 
-use crate::eth::{generate_and_save_mnemonic, EthAddr};
-use crate::tui::helpers::{draw_standard_grid, init_terminal, TermBck};
+use crate::eth::EthAddr;
+use crate::tui::helpers::TermBck;
 use crate::tui::screens::new_wallet::NewWallet;
 use crate::tui::screens::welcome::Welcome;
-use crate::tui::util::event::{Event, Events};
-use crate::tui::util::{StatefulList, TabsState};
 
 // ----------------------------------------------------------------------------- app state
 

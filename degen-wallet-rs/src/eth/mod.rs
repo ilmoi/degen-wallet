@@ -33,7 +33,7 @@ pub fn generate_eth_wallet(mnemonic: Mnemonic) -> Vec<EthAddr> {
     let secp = secp256k1::Secp256k1::new();
     let main_prvk = secp256k1::SecretKey::from_slice(entropy).unwrap();
     let main_pubk = secp256k1::PublicKey::from_secret_key(&secp, &main_prvk);
-    let main_addr = pubk_to_addr(main_pubk);
+    let _main_addr = pubk_to_addr(main_pubk);
     // println!("main addr is {:?}", main_addr);
 
     // ----------------------------------------------------------------------------- 2 derived addr

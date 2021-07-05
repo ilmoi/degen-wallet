@@ -128,3 +128,21 @@ impl<T> StatefulList<T> {
         self.state.select(None);
     }
 }
+
+// ----------------------------------------------------------------------------- my additions
+
+pub struct TabsApp<'a> {
+    pub tabs: TabsState<'a>,
+}
+
+pub struct ListApp<'a> {
+    pub items: StatefulList<&'a str>,
+}
+
+impl<'a> ListApp<'a> {
+    pub fn new(items: Vec<&'a str>) -> ListApp<'a> {
+        Self {
+            items: StatefulList::with_items(items),
+        }
+    }
+}

@@ -5,8 +5,9 @@ use tui::text::Span;
 use tui::widgets::{Block, List, ListItem};
 use tui::Frame;
 
-use crate::tui::helpers::{ListApp, TermBck};
+use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
+use crate::tui::util::ListApp;
 
 pub struct Welcome<'a> {
     pub list_app: ListApp<'a>,
