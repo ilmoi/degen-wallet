@@ -41,7 +41,7 @@ impl Import<'_> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        state: &mut AppState,
+        _state: &mut AppState,
     ) {
         f.render_widget(body_block, body_chunk);
 
@@ -73,7 +73,7 @@ impl Import<'_> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        state: &mut AppState,
+        _state: &mut AppState,
     ) {
         f.render_widget(body_block, body_chunk);
 

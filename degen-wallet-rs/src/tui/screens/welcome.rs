@@ -1,12 +1,12 @@
 use termion::event::Key;
-use tui::layout::{Alignment, Rect};
+use tui::layout::Rect;
 use tui::style::{Color, Style};
-use tui::text::{Span, Spans};
-use tui::widgets::{Block, Borders, Clear, List, ListItem, Paragraph};
+use tui::text::Span;
+use tui::widgets::{Block, List, ListItem};
 use tui::Frame;
 
 use crate::eth::external::get_key_path;
-use crate::tui::helpers::{centered_rect, centered_rect_fixed, TermBck};
+use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::ListApp;
 
@@ -30,7 +30,7 @@ impl<'a> Drawable for Welcome<'a> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        state: &mut AppState,
+        _state: &mut AppState,
     ) {
         if self.list_app.items.items.len() == 2 {
             if let Some(_key) = get_key_path() {

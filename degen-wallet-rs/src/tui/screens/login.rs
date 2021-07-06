@@ -3,7 +3,7 @@ use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::widgets::{Block, Paragraph};
 use tui::Frame;
 
-use crate::eth::external::{decrypt_keystore_file, mnemonic_from_phrase};
+use crate::eth::external::decrypt_keystore_file;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use tui::style::{Color, Modifier, Style};
@@ -33,7 +33,7 @@ impl Drawable for Login<'_> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        state: &mut AppState,
+        _state: &mut AppState,
     ) {
         f.render_widget(body_block, body_chunk);
 

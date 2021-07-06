@@ -5,7 +5,7 @@ use crate::tui::util::StatefulTable;
 use termion::event::Key;
 use tui::layout::{Constraint, Rect};
 use tui::style::{Color, Modifier, Style};
-use tui::widgets::{Block, Borders, Cell, Row, Table};
+use tui::widgets::{Block, Cell, Row, Table};
 use tui::Frame;
 
 pub struct Accounts {
@@ -37,7 +37,7 @@ impl Drawable for Accounts {
                 .collect();
         }
 
-        let mut table = &mut self.account_table;
+        let table = &mut self.account_table;
 
         let selected_style = Style::default().add_modifier(Modifier::REVERSED);
         let normal_style = Style::default().bg(Color::Blue);

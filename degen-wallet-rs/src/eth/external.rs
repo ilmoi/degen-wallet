@@ -1,22 +1,9 @@
-use std::error::Error;
-use std::fs::DirEntry;
-use std::io::ErrorKind;
+use std::fs;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
-use std::{fs, io};
 
 use bip39::{Language, Mnemonic, MnemonicType, Seed};
-use bitcoin::util::bip32::ExtendedPubKey;
-use bitcoin::{
-    network::constants::Network,
-    util::bip32::{DerivationPath, ExtendedPrivKey},
-    PublicKey,
-};
 use eth_keystore::{decrypt_key, encrypt_key};
 use hdpath::{Purpose, StandardHDPath};
-use secp256k1::Secp256k1;
-use serde::{Deserialize, Serialize};
-use sha3::{Digest, Keccak256};
 
 use crate::eth::domain::EthAddr;
 use crate::eth::internal::{

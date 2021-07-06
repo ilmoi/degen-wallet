@@ -1,12 +1,12 @@
 use termion::event::Key;
-use tui::layout::{Alignment, Constraint, Direction, Layout, Rect};
+use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
-use tui::widgets::{Block, Borders, Clear, Paragraph, Wrap};
+use tui::widgets::{Block, Clear, Paragraph, Wrap};
 use tui::Frame;
 
 use crate::eth::external::generate_and_save_mnemonic;
-use crate::tui::helpers::{centered_rect_fixed, TermBck};
+use crate::tui::helpers::TermBck;
 use crate::tui::screens::new_wallet::NewWalletState::RequestPassword;
 use crate::tui::state::{AppState, Drawable, Screen};
 
