@@ -1,16 +1,17 @@
 use termion::event::Key;
-use tui::layout::Rect;
+use tui::layout::{Alignment, Rect};
 use tui::style::{Color, Style};
-use tui::text::Span;
-use tui::widgets::{Block, List, ListItem};
+use tui::text::{Span, Spans};
+use tui::widgets::{Block, Borders, Clear, List, ListItem, Paragraph};
 use tui::Frame;
 
-use crate::tui::helpers::TermBck;
+use crate::tui::helpers::{centered_rect, centered_rect_fixed, TermBck};
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::ListApp;
 
 pub struct Welcome<'a> {
     pub list_app: ListApp<'a>,
+    pub trigger_new: bool,
 }
 
 impl<'a> Welcome<'a> {
@@ -21,6 +22,7 @@ impl<'a> Welcome<'a> {
                 "import existing",
                 "login with passphrase",
             ]),
+            trigger_new: false,
         }
     }
 }
@@ -31,7 +33,7 @@ impl<'a> Drawable for Welcome<'a> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        _state: &mut AppState,
+        state: &mut AppState,
     ) {
         let items: Vec<ListItem> = self
             .list_app
@@ -47,12 +49,26 @@ impl<'a> Drawable for Welcome<'a> {
             .highlight_symbol(">> ");
 
         f.render_stateful_widget(items, body_chunk, &mut self.list_app.items.state);
+
+        //this way can show a wait msg while thread does the work
+        if self.trigger_new {
+            let block = Block::default().borders(Borders::ALL);
+            let p = Paragraph::new("Generating wallet...")
+                .block(block)
+                .alignment(Alignment::Center);
+            let area = centered_rect_fixed(30, 7, f.size());
+            f.render_widget(Clear, area); //this clears out the background
+            f.render_widget(p, area);
+
+            state.screen = Screen::NewWallet;
+        }
     }
     fn set_keybinding(&mut self, key: Key, state: &mut AppState) {
         match key {
             Key::Char('\n') => {
-                // println!("{}", self.list_app.items.state.selected().unwrap());
-                state.screen = Screen::NewWallet;
+                if self.list_app.items.state.selected().unwrap_or(4) == 0 {
+                    self.trigger_new = true;
+                }
             }
             Key::Left => {
                 self.list_app.items.unselect();

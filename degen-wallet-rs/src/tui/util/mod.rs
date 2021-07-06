@@ -1,8 +1,9 @@
 pub mod event;
 
+use crate::eth::EthAddr;
 use rand::distributions::{Distribution, Uniform};
 use rand::rngs::ThreadRng;
-use tui::widgets::ListState;
+use tui::widgets::{ListState, TableState};
 
 #[derive(Clone)]
 pub struct RandomSignal {
@@ -144,5 +145,46 @@ impl<'a> ListApp<'a> {
         Self {
             items: StatefulList::with_items(items),
         }
+    }
+}
+
+pub struct StatefulTable {
+    pub state: TableState,
+    pub items: Vec<(String, f64)>,
+}
+
+impl StatefulTable {
+    pub fn new() -> StatefulTable {
+        StatefulTable {
+            state: TableState::default(),
+            items: vec![],
+        }
+    }
+    pub fn next(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i >= self.items.len() - 1 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    pub fn previous(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    self.items.len() - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
     }
 }

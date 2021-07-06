@@ -8,6 +8,7 @@ use tui::Frame;
 
 use crate::eth::EthAddr;
 use crate::tui::helpers::TermBck;
+use crate::tui::screens::accounts::Accounts;
 use crate::tui::screens::new_wallet::NewWallet;
 use crate::tui::screens::welcome::Welcome;
 
@@ -15,6 +16,8 @@ use crate::tui::screens::welcome::Welcome;
 
 pub struct AppState {
     pub screen: Screen,
+    pub prev_screen: Screen,         //todo
+    pub next_screen: Option<Screen>, //todo
     pub mnemonic: Option<Mnemonic>,
     pub file_uuid: Option<String>,
     pub eth_accounts: Vec<EthAddr>,
@@ -24,6 +27,8 @@ impl AppState {
     pub fn fresh_state() -> Self {
         Self {
             screen: Screen::Welcome,
+            prev_screen: Screen::Welcome,
+            next_screen: None,
             mnemonic: None,
             file_uuid: None,
             eth_accounts: vec![],
@@ -37,6 +42,7 @@ impl AppState {
 pub enum Screen {
     Welcome,
     NewWallet,
+    Accounts,
 }
 
 impl Screen {
@@ -56,6 +62,7 @@ impl Screen {
         let mut h: HashMap<Screen, Box<dyn Drawable>> = HashMap::new();
         h.insert(Screen::Welcome, Box::new(Welcome::new()));
         h.insert(Screen::NewWallet, Box::new(NewWallet::new()));
+        h.insert(Screen::Accounts, Box::new(Accounts::new()));
         h
     }
 }

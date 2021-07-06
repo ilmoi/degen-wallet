@@ -53,7 +53,7 @@ pub fn draw_standard_grid(f: &mut Frame<TermBck>) -> Rect {
         Span::raw(" go back"),
         Span::raw("     "),
         Span::styled("<Enter>", Style::default().add_modifier(Modifier::BOLD)),
-        Span::raw(" select"),
+        Span::raw(" go ahead"),
         Span::raw("     "),
         Span::styled("← ↑ → ↓", Style::default().add_modifier(Modifier::BOLD)),
         Span::raw(" move around"),

@@ -26,7 +26,7 @@ use secp256k1::Secp256k1;
 use serde::{Deserialize, Serialize};
 use sha3::{Digest, Keccak256};
 
-pub fn generate_eth_wallet(mnemonic: Mnemonic) -> Vec<EthAddr> {
+pub fn generate_eth_wallet(mnemonic: &Mnemonic) -> Vec<EthAddr> {
     let entropy = mnemonic.entropy();
 
     // ----------------------------------------------------------------------------- 1 main addr

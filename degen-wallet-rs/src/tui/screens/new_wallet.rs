@@ -1,5 +1,5 @@
 use termion::event::Key;
-use tui::layout::Rect;
+use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
 use tui::widgets::{Block, Paragraph, Wrap};
@@ -36,7 +36,6 @@ impl Drawable for NewWallet {
         }
 
         let text = vec![
-            Spans::from("Generating a new wallet..."),
             Spans::from(vec![
                 Span::raw("Your mnemonic is: "),
                 Span::styled(
@@ -70,7 +69,7 @@ impl Drawable for NewWallet {
     fn set_keybinding(&mut self, key: Key, state: &mut AppState) {
         match key {
             Key::Char('\n') => {
-                state.screen = Screen::Welcome;
+                state.screen = Screen::Accounts;
             }
             _ => {}
         }
