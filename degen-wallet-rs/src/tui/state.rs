@@ -6,9 +6,11 @@ use tui::layout::Rect;
 use tui::widgets::Block;
 use tui::Frame;
 
-use crate::eth::EthAddr;
+use crate::eth::domain::EthAddr;
 use crate::tui::helpers::TermBck;
 use crate::tui::screens::accounts::Accounts;
+use crate::tui::screens::import::Import;
+use crate::tui::screens::login::Login;
 use crate::tui::screens::new_wallet::NewWallet;
 use crate::tui::screens::welcome::Welcome;
 
@@ -42,6 +44,8 @@ impl AppState {
 pub enum Screen {
     Welcome,
     NewWallet,
+    ImportWallet,
+    Login,
     Accounts,
 }
 
@@ -63,6 +67,8 @@ impl Screen {
         h.insert(Screen::Welcome, Box::new(Welcome::new()));
         h.insert(Screen::NewWallet, Box::new(NewWallet::new()));
         h.insert(Screen::Accounts, Box::new(Accounts::new()));
+        h.insert(Screen::ImportWallet, Box::new(Import::new()));
+        h.insert(Screen::Login, Box::new(Login::new()));
         h
     }
 }

@@ -175,6 +175,7 @@ dependencies = [
 name = "degen-wallet-rs"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bitcoin",
  "eth-keystore",
  "eth_checksum",

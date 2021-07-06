@@ -25,3 +25,4 @@ serde = { version="1.0.126", features=["derive"] }
 hex = "0.4.3"
 rand = { version="0.7"} # need 0.7 for eth-keystore to work ok. Might change in future versions ofc.
 tokio = { version="1.8.0", features=["full"] }
+anyhow = "1.0.41"

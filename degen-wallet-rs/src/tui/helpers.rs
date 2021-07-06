@@ -46,7 +46,7 @@ pub fn draw_standard_grid(f: &mut Frame<TermBck>) -> Rect {
     // ----------------------------------------------------------------------------- footer
     let footer = Block::default().borders(Borders::ALL);
     let text = Spans::from(vec![
-        Span::styled("<q>", Style::default().add_modifier(Modifier::BOLD)),
+        Span::styled("<Ctr-c>", Style::default().add_modifier(Modifier::BOLD)),
         Span::raw(" quit"),
         Span::raw("     "),
         Span::styled("<Esc>", Style::default().add_modifier(Modifier::BOLD)),

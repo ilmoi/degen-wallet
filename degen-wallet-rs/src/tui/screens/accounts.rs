@@ -1,4 +1,4 @@
-use crate::eth::generate_eth_wallet;
+use crate::eth::external::generate_eth_wallet;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::StatefulTable;

@@ -32,7 +32,7 @@ pub fn draw_screen() -> Result<(), Box<dyn Error>> {
 
         match events.next()? {
             Event::Input(input) => match input {
-                Key::Char('q') => {
+                Key::Ctrl('c') => {
                     break;
                 }
                 _ => current_screen.set_keybinding(input, &mut state),

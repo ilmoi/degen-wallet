@@ -1,6 +1,6 @@
 pub mod event;
 
-use crate::eth::EthAddr;
+use crate::eth::domain::EthAddr;
 use rand::distributions::{Distribution, Uniform};
 use rand::rngs::ThreadRng;
 use tui::widgets::{ListState, TableState};
