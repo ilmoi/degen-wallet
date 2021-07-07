@@ -6,23 +6,28 @@ use tui::layout::Rect;
 use tui::widgets::Block;
 use tui::Frame;
 
-use crate::eth::domain::EthAddr;
 use crate::tui::helpers::TermBck;
 use crate::tui::screens::accounts::Accounts;
 use crate::tui::screens::import::Import;
 use crate::tui::screens::login::Login;
 use crate::tui::screens::new_wallet::NewWallet;
+use crate::tui::screens::transaction::Transaction;
 use crate::tui::screens::welcome::Welcome;
+use web3::types::Address;
 
 // ----------------------------------------------------------------------------- app state
 
 pub struct AppState {
     pub screen: Screen,
-    pub prev_screen: Screen,         //todo
-    pub next_screen: Option<Screen>, //todo
+    pub prev_screen: Screen,
     pub mnemonic: Option<Mnemonic>,
     pub file_uuid: Option<String>,
-    pub eth_accounts: Vec<EthAddr>,
+    pub eth_accounts: (
+        Vec<Address>,
+        Vec<secp256k1::PublicKey>,
+        Vec<secp256k1::SecretKey>,
+    ),
+    pub selected_acc: usize,
 }
 
 impl AppState {
@@ -30,23 +35,24 @@ impl AppState {
         Self {
             screen: Screen::Welcome,
             prev_screen: Screen::Welcome,
-            next_screen: None,
             mnemonic: None,
             file_uuid: None,
-            eth_accounts: vec![],
+            eth_accounts: (vec![], vec![], vec![]),
+            selected_acc: 0,
         }
     }
 }
 
 // ----------------------------------------------------------------------------- screens
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone)]
 pub enum Screen {
     Welcome,
     NewWallet,
     ImportWallet,
     Login,
     Accounts,
+    Transaction,
 }
 
 impl Screen {
@@ -69,6 +75,7 @@ impl Screen {
         h.insert(Screen::Accounts, Box::new(Accounts::new()));
         h.insert(Screen::ImportWallet, Box::new(Import::new()));
         h.insert(Screen::Login, Box::new(Login::new()));
+        h.insert(Screen::Transaction, Box::new(Transaction::new()));
         h
     }
 }

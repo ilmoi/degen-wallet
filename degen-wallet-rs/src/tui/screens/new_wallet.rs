@@ -5,7 +5,7 @@ use tui::text::{Span, Spans};
 use tui::widgets::{Block, Clear, Paragraph, Wrap};
 use tui::Frame;
 
-use crate::eth::external::generate_and_save_mnemonic;
+use crate::eth::wallet::external::generate_and_save_mnemonic;
 use crate::tui::helpers::TermBck;
 use crate::tui::screens::new_wallet::NewWalletState::RequestPassword;
 use crate::tui::state::{AppState, Drawable, Screen};
@@ -49,14 +49,16 @@ impl NewWallet {
             Span::raw(" when done."),
         ]);
 
-        let into_p = Paragraph::new(text);
-        f.render_widget(into_p, chunks[0]);
+        let intro_p = Paragraph::new(text).wrap(Wrap { trim: true });
+        f.render_widget(intro_p, chunks[0]);
 
-        let input_p = Paragraph::new(self.passphrase.as_ref()).style(
-            Style::default()
-                .bg(Color::Rgb(20, 20, 20))
-                .fg(Color::Yellow),
-        );
+        let input_p = Paragraph::new(self.passphrase.as_ref())
+            .style(
+                Style::default()
+                    .bg(Color::Rgb(20, 20, 20))
+                    .fg(Color::Yellow),
+            )
+            .wrap(Wrap { trim: true });
         f.render_widget(input_p, chunks[1]);
 
         //set the cursor to be visible
@@ -98,7 +100,10 @@ impl NewWallet {
             Spans::from(vec![
                 Span::raw("We also generated a Keystore file for you and saved it under "),
                 Span::styled(
-                    format!("/keys/{}", state.file_uuid.as_ref().unwrap()),
+                    format!(
+                        "/keys/{}",
+                        state.file_uuid.as_ref().unwrap_or(&String::from(""))
+                    ),
                     Style::default().fg(Color::Cyan),
                 ),
                 Span::raw("."),
@@ -130,6 +135,8 @@ impl Drawable for NewWallet {
         f: &mut Frame<TermBck>,
         state: &mut AppState,
     ) {
+        state.prev_screen = Screen::Welcome; //no point going back to new wallet
+
         match self.new_wallet_state {
             NewWalletState::RequestPassword => {
                 self.render_request_passphrase(body_chunk, body_block, f)
@@ -146,9 +153,11 @@ impl Drawable for NewWallet {
             Key::Char('\n') => match self.new_wallet_state {
                 NewWalletState::RequestPassword => {
                     self.new_wallet_state = NewWalletState::WaitForGen;
+                    state.mnemonic = None; //need to clear any previous mnemonics from logging in
                 }
                 NewWalletState::DisplayMnemonic => {
                     state.screen = Screen::Accounts;
+                    state.eth_accounts = (vec![], vec![], vec![]) //nullify existing accounts since we're gonna have new
                 }
                 _ => {}
             },

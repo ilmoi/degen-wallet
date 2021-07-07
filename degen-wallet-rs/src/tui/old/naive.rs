@@ -1,4 +1,4 @@
-use crate::eth::generate_and_save_mnemonic;
+use crate::eth::wallet::generate_and_save_mnemonic;
 use crate::tui::util::event::{Event, Events};
 use crate::tui::util::{StatefulList, TabsState};
 use bip39::Mnemonic;

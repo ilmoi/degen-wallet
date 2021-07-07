@@ -2,56 +2,73 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use bip39::{Language, Mnemonic, MnemonicType, Seed};
+use bitcoin::PublicKey;
 use eth_keystore::{decrypt_key, encrypt_key};
 use hdpath::{Purpose, StandardHDPath};
+use secp256k1::SecretKey;
+use web3::types::Address;
 
-use crate::eth::domain::EthAddr;
-use crate::eth::internal::{
-    get_extended_keypair, pubk_to_addr, remove_dir_contents, xpubk_to_pubk,
+use crate::eth::wallet::internal::{
+    get_extended_keypair, pubk_to_addr, remove_dir_contents, xprv_to_prvk, xpubk_to_pubk,
 };
 
-/// How it works:
-/// 1. generate a new mnemonic (tiny-bip39)
-/// 2. mnemonic -> entropy -> keystore file (eth-keystore)
-/// 3. mnemonic -> seed -> xpub -> pk, pubk -> eth addr (hdpath, bitcoin, secp25k1, sha3, eth_checksum)
-///
 /// (!) todo I don't claim this wallet is 100% secure.
 ///     This is my first ever wallet put together with the help of reddit and a bunch of random websits.
 ///     For all I know it might be leaking private shit left and right.
 ///     The only guarantee at this point that I'm prepared to make is that it _works_.
 ///     As in - the private key / mnemonic / keystore file successfully access the same ethereum accounts derived below
 ///     When entered on https://www.myetherwallet.com/access-my-wallet
-pub fn generate_eth_wallet(mnemonic: &Mnemonic) -> Vec<EthAddr> {
-    let entropy = mnemonic.entropy();
-
-    // ----------------------------------------------------------------------------- 1 main addr
-    let secp = secp256k1::Secp256k1::new();
-    let main_prvk = secp256k1::SecretKey::from_slice(entropy).unwrap();
-    let main_pubk = secp256k1::PublicKey::from_secret_key(&secp, &main_prvk);
-    let _main_addr = pubk_to_addr(main_pubk);
-    // println!("main addr is {:?}", main_addr);
-
-    // ----------------------------------------------------------------------------- 2 derived addr
-    // get the HD wallet seed
-    let seed = Seed::new(&mnemonic, ""); //128 hex chars = 512 bits
+pub fn generate_eth_wallet(
+    mnemonic: &Mnemonic,
+) -> (
+    Vec<Address>,
+    Vec<secp256k1::PublicKey>,
+    Vec<secp256k1::SecretKey>,
+) {
+    // seed vs entropy
+    // seed = entropy that went through 2048 repeated rounds of HMAC-SHA256 hashing as described here https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#from-mnemonic-to-seed
+    // use seed, NOT entropy for private key calc - https://github.com/rust-bitcoin/rust-secp256k1/issues/321
+    let seed = Seed::new(&mnemonic, ""); //128 hex chars = 512 bits = 64 bytes
     let seed_bytes: &[u8] = seed.as_bytes();
     // println!("Seed: {:X}", seed);
-    // println!("Seed as bytes: {:?}", seed_bytes);
+    // println!("Seed as bytes: {:?}", seed_bytes.len());
 
+    // ----------------------------------------------------------------------------- 1 deterministic wallet
+
+    // todo still doesn't work - https://github.com/rust-bitcoin/rust-secp256k1/issues/321
+    // let secp = secp256k1::Secp256k1::new();
+    // let deterministic_prvk = secp256k1::SecretKey::from_slice(&seed_bytes).unwrap();
+    // let deterministic_pubk = secp256k1::PublicKey::from_secret_key(&secp, &deterministic_prvk);
+    // let deterministic_addr = pubk_to_addr(deterministic_pubk);
+    // println!(
+    //     "addr: {:?}, pubk: {}, prvk: {}",
+    //     deterministic_addr, deterministic_pubk, deterministic_prvk
+    // );
+
+    // √ verify against https://www.myetherwallet.com/access-my-wallet
+
+    // ----------------------------------------------------------------------------- 2 HD wallet
+    let mut private_keys = vec![];
+    let mut public_keys = vec![];
     let mut derived_eth_addresses = vec![];
 
     for i in 0..10 {
         let hd_path = StandardHDPath::new(Purpose::Pubkey, 60, 0, 0, i);
         //Defined in the BIP 32 spec, extended private keys are a Base58 encoding of the private key, chain code, and some additional metadata.
-        //xpk never stored in this impl
-        let (_xprv, xpub) = get_extended_keypair(&seed_bytes, &hd_path);
+        let (xprv, xpub) = get_extended_keypair(&seed_bytes, &hd_path);
+        let prvk = xprv_to_prvk(xprv);
         let pubk = xpubk_to_pubk(xpub);
         let eth_addr = pubk_to_addr(pubk);
+
+        // println!("{}, {}, {}", eth_addr, pubk, prvk);
         // √ verify against https://iancoleman.io/bip39/#english
+
+        private_keys.push(prvk);
+        public_keys.push(pubk);
         derived_eth_addresses.push(eth_addr);
     }
 
-    derived_eth_addresses
+    (derived_eth_addresses, public_keys, private_keys)
 }
 
 pub fn mnemonic_from_phrase(mnemonic: &str) -> Result<Mnemonic, anyhow::Error> {
@@ -63,15 +80,7 @@ pub fn import_and_save_mnemonic(mnemonic: &Mnemonic, password: &str) -> String {
 }
 
 pub fn generate_and_save_mnemonic(password: &str) -> (Mnemonic, String) {
-    // ----------------------------------------------------------------------------- 1 mnemonic
     let mnemonic = Mnemonic::new(MnemonicType::Words24, Language::English);
-    // let mnemonic = Mnemonic::from_phrase(
-    //     "machine fabric tiny arctic alien brave start donkey near despair manual chest",
-    //     Language::English,
-    // )
-    // .unwrap();
-
-    // ----------------------------------------------------------------------------- 2 keystore
     let uuid = encrypt_keystore_file(&mnemonic, password);
     (mnemonic, uuid)
 }

@@ -1,12 +1,16 @@
-use crate::eth::external::generate_eth_wallet;
+use crate::eth::wallet::domain::StrAddr;
+use crate::eth::wallet::external::generate_eth_wallet;
+use crate::eth::web3::{get_balance, get_balances};
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::StatefulTable;
+use bitcoin::hashes::hex::ToHex;
 use termion::event::Key;
 use tui::layout::{Constraint, Rect};
 use tui::style::{Color, Modifier, Style};
 use tui::widgets::{Block, Cell, Row, Table};
 use tui::Frame;
+use web3::types::Address;
 
 pub struct Accounts {
     pub account_table: StatefulTable,
@@ -28,12 +32,18 @@ impl Drawable for Accounts {
         f: &mut Frame<TermBck>,
         state: &mut AppState,
     ) {
-        if state.eth_accounts.len() == 0 {
+        state.prev_screen = Screen::Welcome;
+
+        if state.eth_accounts.0.len() == 0 {
             state.eth_accounts = generate_eth_wallet(state.mnemonic.as_ref().unwrap());
+            let balances = get_balances(&state.eth_accounts.0);
+
             self.account_table.items = state
                 .eth_accounts
+                .0
                 .iter()
-                .map(|a| (String::from(a.get()), 0.0))
+                .enumerate()
+                .map(|(i, a)| (a.to_str_addr(), balances[i]))
                 .collect();
         }
 
@@ -52,14 +62,8 @@ impl Drawable for Accounts {
             .bottom_margin(1);
 
         let rows = table.items.iter().map(|item| {
-            // let height = item
-            //     .iter()
-            //     .map(|content| content.chars().filter(|c| *c == '\n').count())
-            //     .max()
-            //     .unwrap_or(0)
-            //     + 1;
-            // let cells = item.iter().map(|c| Cell::from(*c));
             let cells = vec![
+                //todo is clone() the best solution here?
                 Cell::from(item.0.clone()),
                 Cell::from(format!("{}", item.1)),
             ];
@@ -81,7 +85,8 @@ impl Drawable for Accounts {
     fn set_keybinding(&mut self, key: Key, state: &mut AppState) {
         match key {
             Key::Char('\n') => {
-                state.screen = Screen::Welcome;
+                state.selected_acc = self.account_table.state.selected().unwrap();
+                state.screen = Screen::Transaction;
             }
             Key::Down => {
                 self.account_table.next();

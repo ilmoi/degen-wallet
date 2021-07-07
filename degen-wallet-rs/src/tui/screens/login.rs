@@ -1,9 +1,9 @@
 use termion::event::Key;
 use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::widgets::{Block, Paragraph};
+use tui::widgets::{Block, Paragraph, Wrap};
 use tui::Frame;
 
-use crate::eth::external::decrypt_keystore_file;
+use crate::eth::wallet::external::decrypt_keystore_file;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use tui::style::{Color, Modifier, Style};
@@ -33,8 +33,10 @@ impl Drawable for Login<'_> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        _state: &mut AppState,
+        state: &mut AppState,
     ) {
+        state.prev_screen = Screen::Welcome; //no point going back to login
+
         f.render_widget(body_block, body_chunk);
 
         let chunks = Layout::default()
@@ -44,14 +46,16 @@ impl Drawable for Login<'_> {
             .split(f.size());
 
         //todo clone() - Spans doesn't accept a reference
-        let into_p = Paragraph::new(Spans::from(self.msg.clone()));
-        f.render_widget(into_p, chunks[0]);
+        let intro_p = Paragraph::new(Spans::from(self.msg.clone())).wrap(Wrap { trim: true });
+        f.render_widget(intro_p, chunks[0]);
 
-        let input_p = Paragraph::new(self.input.as_ref()).style(
-            Style::default()
-                .bg(Color::Rgb(20, 20, 20))
-                .fg(Color::Yellow),
-        );
+        let input_p = Paragraph::new(self.input.as_ref())
+            .style(
+                Style::default()
+                    .bg(Color::Rgb(20, 20, 20))
+                    .fg(Color::Yellow),
+            )
+            .wrap(Wrap { trim: true });
         f.render_widget(input_p, chunks[1]);
 
         //set the cursor

@@ -1,3 +1,2 @@
-pub mod domain;
-pub mod external;
-pub mod internal;
+pub mod wallet;
+pub mod web3;

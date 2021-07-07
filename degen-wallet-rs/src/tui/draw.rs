@@ -35,6 +35,11 @@ pub fn draw_screen() -> Result<(), Box<dyn Error>> {
                 Key::Ctrl('c') => {
                     break;
                 }
+                Key::Esc => {
+                    // I think we're forced to .clone() here
+                    // if we used a ref to prev_screen and prev_screen changed, this would change too = not good
+                    state.screen = state.prev_screen.clone();
+                }
                 _ => current_screen.set_keybinding(input, &mut state),
             },
             _ => {}

@@ -5,7 +5,7 @@ use tui::text::Span;
 use tui::widgets::{Block, List, ListItem};
 use tui::Frame;
 
-use crate::eth::external::get_key_path;
+use crate::eth::wallet::external::get_key_path;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::ListApp;
@@ -30,8 +30,10 @@ impl<'a> Drawable for Welcome<'a> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        _state: &mut AppState,
+        state: &mut AppState,
     ) {
+        state.prev_screen = Screen::Welcome;
+
         if self.list_app.items.items.len() == 2 {
             if let Some(_key) = get_key_path() {
                 self.list_app.items.items.insert(0, "login with passphrase");

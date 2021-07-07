@@ -57,6 +57,9 @@ pub fn draw_standard_grid(f: &mut Frame<TermBck>) -> Rect {
         Span::raw("     "),
         Span::styled("← ↑ → ↓", Style::default().add_modifier(Modifier::BOLD)),
         Span::raw(" move around"),
+        // Span::raw("     "),
+        // Span::styled("<s>", Style::default().add_modifier(Modifier::BOLD)),
+        // Span::raw(" send transaction"),
     ]);
     let tips = Paragraph::new(text)
         .block(footer)

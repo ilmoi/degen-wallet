@@ -26,3 +26,6 @@ hex = "0.4.3"
 rand = { version="0.7"} # need 0.7 for eth-keystore to work ok. Might change in future versions ofc.
 tokio = { version="1.8.0", features=["full"] }
 anyhow = "1.0.41"
+web3 = "0.16.0"
+#lazy_static = "1.4.0"
+#async-trait = "0.1.50"

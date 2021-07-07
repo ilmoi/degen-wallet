@@ -1,21 +1,19 @@
 use std::path::Path;
 use std::str::FromStr;
+use std::{fs, io};
 
-use crate::eth::domain::EthAddr;
-
+use bitcoin::util::base58;
 use bitcoin::util::bip32::ExtendedPubKey;
 use bitcoin::{
     network::constants::Network,
     util::bip32::{DerivationPath, ExtendedPrivKey},
-    PublicKey,
+    PrivateKey, PublicKey,
 };
-
 use hdpath::StandardHDPath;
 use secp256k1::Secp256k1;
 use serde::Serialize;
 use sha3::{Digest, Keccak256};
-
-use std::{fs, io};
+use web3::types::Address;
 
 pub fn remove_dir_contents<P: AsRef<Path>>(path: P) -> io::Result<()> {
     for entry in fs::read_dir(path)? {
@@ -39,22 +37,29 @@ pub fn get_extended_keypair(
     // println!("HD path: {}", hd_path);
     // println!(
     //     "xprv: {}, pk: {}, chain_code: {}",
-    //     xpk, xpk.private_key, xpk.chain_code
+    //     xprv, xprv.private_key, xprv.chain_code
     // );
     // println!(
     //     "xpub: {}, pubk: {}, chain_code: {}",
-    //     xpubk, xpubk.public_key, xpubk.chain_code
+    //     xpub, xpub.public_key, xpub.chain_code
     // );
 
     (xprv, xpub)
 }
 
-pub fn xpubk_to_pubk(xpub: ExtendedPubKey) -> secp256k1::PublicKey {
-    let pubk_str = xpub.public_key.to_string();
-    secp256k1::PublicKey::from_str(&pubk_str).unwrap()
+pub fn xprv_to_prvk(xprv: ExtendedPrivKey) -> secp256k1::SecretKey {
+    //NOTE: because the library is for btc not eth, this is WIF encoded
+    // need to add .key to get it from wif format to normal secret key format
+    // more here - https://learnmeabitcoin.com/technical/wif
+    xprv.private_key.key
 }
 
-pub fn pubk_to_addr(pubk: secp256k1::PublicKey) -> EthAddr {
+pub fn xpubk_to_pubk(xpub: ExtendedPubKey) -> secp256k1::PublicKey {
+    //NOTE: this is outputted in hex, no further massaging necessary
+    xpub.public_key.key
+}
+
+pub fn pubk_to_addr(pubk: secp256k1::PublicKey) -> Address {
     //format as uncompressed key, remove "04" in the beginning
     let pubk_uncomp = &PublicKey::new_uncompressed(pubk).to_string()[2..];
     //decode from hex and pass to keccak for hashing
@@ -63,7 +68,7 @@ pub fn pubk_to_addr(pubk: secp256k1::PublicKey) -> EthAddr {
     //keep last 20 bytes of the result
     let addr = &addr[(addr.len() - 40)..];
     //massage into domain unit
-    EthAddr::new(addr)
+    Address::from_str(addr).unwrap()
 }
 
 pub fn keccak_hash<T>(data: &T) -> String
