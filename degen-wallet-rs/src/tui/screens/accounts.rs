@@ -1,19 +1,15 @@
 use crate::eth::wallet::domain::StrAddr;
 use crate::eth::wallet::external::generate_eth_wallet;
-use crate::eth::web3::{get_balance, get_balances};
+use crate::eth::web3::get_balances;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::StatefulTable;
-use bitcoin::hashes::hex::ToHex;
-use std::ops::DerefMut;
-use std::sync::{Arc, Mutex};
-use std::thread;
+
 use termion::event::Key;
 use tui::layout::{Constraint, Rect};
 use tui::style::{Color, Modifier, Style};
 use tui::widgets::{Block, Cell, Row, Table};
 use tui::Frame;
-use web3::types::Address;
 
 pub struct Accounts {
     pub account_table: StatefulTable,

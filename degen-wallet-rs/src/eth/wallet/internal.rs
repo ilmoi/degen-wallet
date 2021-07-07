@@ -2,12 +2,11 @@ use std::path::Path;
 use std::str::FromStr;
 use std::{fs, io};
 
-use bitcoin::util::base58;
 use bitcoin::util::bip32::ExtendedPubKey;
 use bitcoin::{
     network::constants::Network,
     util::bip32::{DerivationPath, ExtendedPrivKey},
-    PrivateKey, PublicKey,
+    PublicKey,
 };
 use hdpath::StandardHDPath;
 use secp256k1::Secp256k1;

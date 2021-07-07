@@ -3,11 +3,9 @@ use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::widgets::{Block, Paragraph, Wrap};
 use tui::Frame;
 
-use crate::eth::wallet::external::decrypt_keystore_file;
 use crate::eth::web3::send_signed_tx;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
-use sha3::digest::generic_array::typenum::private::Trim;
 use std::str::FromStr;
 use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
@@ -95,7 +93,7 @@ impl Transaction<'_> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        state: &mut AppState,
+        _state: &mut AppState,
     ) {
         let text = vec![
             Span::styled("Transaction succeeded. ", Style::default().fg(Color::Green)),
@@ -111,7 +109,7 @@ impl Transaction<'_> {
     }
 
     pub fn parse_input(&self) -> anyhow::Result<(Address, f64)> {
-        let mut split = self.input.split(",");
+        let split = self.input.split(",");
         let mut split_vec = split.collect::<Vec<&str>>();
         let amount = split_vec
             .pop()

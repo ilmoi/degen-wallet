@@ -2,10 +2,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use bip39::{Language, Mnemonic, MnemonicType, Seed};
-use bitcoin::PublicKey;
+
 use eth_keystore::{decrypt_key, encrypt_key};
 use hdpath::{Purpose, StandardHDPath};
-use secp256k1::SecretKey;
+
 use web3::types::Address;
 
 use crate::eth::wallet::internal::{

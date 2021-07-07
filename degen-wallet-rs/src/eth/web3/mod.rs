@@ -6,7 +6,6 @@
 
 use secp256k1::SecretKey;
 use std::str::FromStr;
-use web3::api::Namespace;
 use web3::transports::Http;
 use web3::types::{Address, TransactionParameters, TransactionRequest, U256};
 use web3::Web3;

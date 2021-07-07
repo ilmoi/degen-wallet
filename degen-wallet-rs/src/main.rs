@@ -1,13 +1,7 @@
-use bip39::Mnemonic;
-use degen_wallet_rs::eth::wallet::external::{generate_eth_wallet, mnemonic_from_phrase};
-use degen_wallet_rs::eth::wallet::internal::get_extended_keypair;
-use degen_wallet_rs::eth::web3::{eth_to_wei, send_signed_tx, send_tx};
 use degen_wallet_rs::tui::draw::draw_screen;
-use hdpath::{Purpose, StandardHDPath};
+
 use std::panic;
 use std::panic::PanicInfo;
-use std::str::FromStr;
-use web3::types::{Address, H160, U256};
 
 /// since our app is a tui, and we're inside an alt screen, normal panics won't show
 /// we need to write a custom panic hook
