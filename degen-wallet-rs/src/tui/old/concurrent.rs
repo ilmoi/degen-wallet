@@ -147,9 +147,6 @@ impl Drawable for NewWallet {
         f: &mut Frame<TermBck>,
         state: Arc<Mutex<AppState>>,
     ) {
-        //todo ask for pw
-
-        //todo can be done better?
         let thread_state = state.clone();
         let mut lock = state.lock().unwrap();
         let state = lock.deref();
@@ -225,7 +222,6 @@ pub fn draw_screen() -> Result<(), Box<dyn Error>> {
     let mut screens = Screen::init_screens();
 
     loop {
-        //todo can be done better?
         let local_state = arc_state.clone();
         let lock = local_state.lock().unwrap();
         current_screen = screens.get_mut(&lock.deref().screen).unwrap();

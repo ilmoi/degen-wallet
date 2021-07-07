@@ -85,8 +85,6 @@ impl NewWallet {
         }
     }
     fn draw_body(&mut self, body_chunk: Rect, body_block: Block, f: &mut Frame<TermBck>) {
-        //todo ask for pw
-
         let text = vec![
             Spans::from("Generating a new wallet..."),
             Spans::from(vec![

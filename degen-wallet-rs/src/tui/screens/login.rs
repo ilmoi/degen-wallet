@@ -45,7 +45,7 @@ impl Drawable for Login<'_> {
             .constraints([Constraint::Length(3), Constraint::Min(0)])
             .split(f.size());
 
-        //todo clone() - Spans doesn't accept a reference
+        //Spans doesn't accept a reference to a vector, only the vector itself - hence have to use clone()
         let intro_p = Paragraph::new(Spans::from(self.msg.clone())).wrap(Wrap { trim: true });
         f.render_widget(intro_p, chunks[0]);
 

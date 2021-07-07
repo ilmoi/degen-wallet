@@ -73,7 +73,7 @@ impl Transaction<'_> {
         let p = Paragraph::new(Spans::from(text)).wrap(Wrap { trim: true });
         f.render_widget(p, chunks[0]);
 
-        //todo clone() - Spans doesn't accept a reference
+        //Spans doesn't accept a reference to a vector, only the vector itself - hence have to use clone()
         let intro_p = Paragraph::new(Spans::from(self.msg.clone())).wrap(Wrap { trim: true });
         f.render_widget(intro_p, chunks[1]);
 

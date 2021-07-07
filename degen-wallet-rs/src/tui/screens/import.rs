@@ -51,7 +51,7 @@ impl Import<'_> {
             .constraints([Constraint::Length(3), Constraint::Min(0)])
             .split(f.size());
 
-        //todo clone() - Spans doesn't accept a reference
+        //Spans doesn't accept a reference to a vector, only the vector itself - hence have to use clone()
         let text = Spans::from(self.msg.clone());
 
         let intro_p = Paragraph::new(text).wrap(Wrap { trim: true });

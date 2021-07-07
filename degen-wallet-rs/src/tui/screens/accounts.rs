@@ -31,7 +31,9 @@ impl Accounts {
     pub fn update_balances(&mut self, state: &mut AppState) {
         let balances = get_balances(&state.eth_accounts.0);
 
-        //todo tried making this async / putting on another thread but it's painful
+        //todo tried making this async / putting on another thread but problem with mutexes
+        // asked - https://stackoverflow.com/questions/68254268/concurrency-in-a-rust-tui-app-lock-starvation-issue
+        // I think the solution is either RefCell or channels. Decided to leave for now
         self.account_table.items = state
             .eth_accounts
             .0
@@ -77,11 +79,7 @@ impl Drawable for Accounts {
             .bottom_margin(1);
 
         let rows = self.account_table.items.iter().map(|item| {
-            let cells = vec![
-                //todo is clone() the best solution here?
-                Cell::from(item.0.clone()),
-                Cell::from(format!("{}", item.1)),
-            ];
+            let cells = vec![Cell::from(&item.0[..]), Cell::from(format!("{}", item.1))];
             Row::new(cells).height(1).bottom_margin(1)
         });
 
