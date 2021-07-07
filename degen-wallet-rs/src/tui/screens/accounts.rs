@@ -5,6 +5,9 @@ use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::StatefulTable;
 use bitcoin::hashes::hex::ToHex;
+use std::ops::DerefMut;
+use std::sync::{Arc, Mutex};
+use std::thread;
 use termion::event::Key;
 use tui::layout::{Constraint, Rect};
 use tui::style::{Color, Modifier, Style};
@@ -14,13 +17,28 @@ use web3::types::Address;
 
 pub struct Accounts {
     pub account_table: StatefulTable,
+    pub refresh_count: u8,
 }
 
 impl Accounts {
     pub fn new() -> Self {
         Self {
             account_table: StatefulTable::new(),
+            refresh_count: 0,
         }
+    }
+
+    pub fn update_balances(&mut self, state: &mut AppState) {
+        let balances = get_balances(&state.eth_accounts.0);
+
+        //todo tried making this async / putting on another thread but it's painful
+        self.account_table.items = state
+            .eth_accounts
+            .0
+            .iter()
+            .enumerate()
+            .map(|(i, a)| (a.to_str_addr(), balances[i]))
+            .collect();
     }
 }
 
@@ -36,18 +54,15 @@ impl Drawable for Accounts {
 
         if state.eth_accounts.0.len() == 0 {
             state.eth_accounts = generate_eth_wallet(state.mnemonic.as_ref().unwrap());
-            let balances = get_balances(&state.eth_accounts.0);
-
-            self.account_table.items = state
-                .eth_accounts
-                .0
-                .iter()
-                .enumerate()
-                .map(|(i, a)| (a.to_str_addr(), balances[i]))
-                .collect();
+            self.update_balances(state);
         }
 
-        let table = &mut self.account_table;
+        // refresh balances once every 10 seconds
+        self.refresh_count += 1;
+        if self.refresh_count >= 200 {
+            self.update_balances(state);
+            self.refresh_count = 0;
+        }
 
         let selected_style = Style::default().add_modifier(Modifier::REVERSED);
         let normal_style = Style::default().bg(Color::Blue);
@@ -61,7 +76,7 @@ impl Drawable for Accounts {
             .height(1)
             .bottom_margin(1);
 
-        let rows = table.items.iter().map(|item| {
+        let rows = self.account_table.items.iter().map(|item| {
             let cells = vec![
                 //todo is clone() the best solution here?
                 Cell::from(item.0.clone()),
@@ -80,7 +95,7 @@ impl Drawable for Accounts {
                 Constraint::Length(30),
                 Constraint::Max(10),
             ]);
-        f.render_stateful_widget(t, body_chunk, &mut table.state);
+        f.render_stateful_widget(t, body_chunk, &mut self.account_table.state);
     }
     fn set_keybinding(&mut self, key: Key, state: &mut AppState) {
         match key {
