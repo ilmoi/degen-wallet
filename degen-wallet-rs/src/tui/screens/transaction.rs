@@ -1,15 +1,16 @@
+use std::str::FromStr;
+
 use termion::event::Key;
 use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::widgets::{Block, Paragraph, Wrap};
-use tui::Frame;
-
-use crate::eth::web3::send_signed_tx;
-use crate::tui::helpers::TermBck;
-use crate::tui::state::{AppState, Drawable, Screen};
-use std::str::FromStr;
 use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
+use tui::widgets::{Block, Paragraph, Wrap};
+use tui::Frame;
 use web3::types::Address;
+
+use crate::eth::web3::transaction::send_signed_tx;
+use crate::tui::helpers::TermBck;
+use crate::tui::state::{AppState, Drawable, Screen};
 
 #[derive(PartialEq)]
 pub enum TxState {

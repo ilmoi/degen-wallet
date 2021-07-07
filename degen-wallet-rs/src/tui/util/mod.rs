@@ -2,6 +2,7 @@ pub mod event;
 
 use rand::distributions::{Distribution, Uniform};
 use rand::rngs::ThreadRng;
+use std::collections::{BTreeMap, HashMap};
 use tui::widgets::{ListState, TableState};
 
 #[derive(Clone)]
@@ -149,7 +150,8 @@ impl<'a> ListApp<'a> {
 
 pub struct StatefulTable {
     pub state: TableState,
-    pub items: Vec<(String, f64)>,
+    // vector of tuples of (String - Hashmap)
+    pub items: Vec<(String, BTreeMap<String, f64>)>,
 }
 
 impl StatefulTable {
