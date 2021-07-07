@@ -37,27 +37,12 @@ fn main() {
     // let a1 = H160::from_str("0xCd550E94040cEC1b33589eB99B0E1241Baa75D19").unwrap();
     // let a2 = H160::from_str("0xC48ad5fd060e1400a41bcf51db755251AD5A2475").unwrap();
     // println!("{:?}, {:?}", a1, a2);
-    //
-    // // ----------------------------------------------------------------------------- private key
+
+    // // ----------------------------------------------------------------------------- eth wallet
     // let mnemonic = "window recall kid brief dragon worry intact board thumb aunt hair cement";
     // let mnemonic = mnemonic_from_phrase(mnemonic).unwrap();
     // let (a, pubk, prvk) = generate_eth_wallet(&mnemonic);
-    // let prvk = prvk[0];
-    // println!("signing with {}", prvk);
-    //
-    // // ----------------------------------------------------------------------------- send
-    // send_signed_tx(a1, a2, prvk);
-    draw_screen().unwrap();
 
-    // let input = "0xBa313096524df5a200A2D15B845BA3Dca473fD5f, 1.123456";
-    // let mut split = input.split(",");
-    // let mut split_vec = split.collect::<Vec<&str>>();
-    // let amount = split_vec.pop().unwrap().trim().parse::<f64>().unwrap();
-    // let addr = split_vec.pop().unwrap().trim();
-    // let addr = Address::from_str(addr).unwrap();
-    // println!("{} {}", addr, amount);
-    //
-    // let eth = (amount * 100000.0) as u64;
-    // let x = U256::from(eth) * U256::exp10(13);
-    // println!("converted amount is {}", x);
+    // ----------------------------------------------------------------------------- draw
+    draw_screen().unwrap();
 }

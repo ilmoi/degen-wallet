@@ -34,10 +34,11 @@ pub fn generate_eth_wallet(
     // println!("Seed as bytes: {:?}", seed_bytes.len());
 
     // ----------------------------------------------------------------------------- 1 deterministic wallet
-
-    // todo still doesn't work - https://github.com/rust-bitcoin/rust-secp256k1/issues/321
+    // NOTE: we need to use the left 32 bytes of the seed for deterministic wallet derivation More:
+    // https://github.com/rust-bitcoin/rust-secp256k1/issues/321
+    // "Split I into two 32-byte sequences, IL and IR." - https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
     // let secp = secp256k1::Secp256k1::new();
-    // let deterministic_prvk = secp256k1::SecretKey::from_slice(&seed_bytes).unwrap();
+    // let deterministic_prvk = secp256k1::SecretKey::from_slice(&seed_bytes[..32]).unwrap();
     // let deterministic_pubk = secp256k1::PublicKey::from_secret_key(&secp, &deterministic_prvk);
     // let deterministic_addr = pubk_to_addr(deterministic_pubk);
     // println!(
