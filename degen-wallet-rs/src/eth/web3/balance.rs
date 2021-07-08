@@ -1,9 +1,6 @@
 use crate::eth::web3::{setup_web3, u256_to_float};
-use secp256k1::SecretKey;
-use std::str::FromStr;
-use web3::transports::Http;
-use web3::types::{Address, TransactionParameters, TransactionRequest, U256};
-use web3::Web3;
+
+use web3::types::Address;
 
 #[tokio::main]
 pub async fn get_balances(addresses: &Vec<Address>) -> anyhow::Result<Vec<f64>> {

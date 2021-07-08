@@ -125,7 +125,7 @@ impl Drawable for Accounts {
     fn set_keybinding(&mut self, key: Key, state: &mut AppState) {
         match key {
             Key::Char('\n') => {
-                state.selected_acc = self.account_table.state.selected().unwrap();
+                state.selected_acc = self.account_table.state.selected().unwrap_or(0);
                 state.screen = Screen::Transaction;
             }
             Key::Down => {

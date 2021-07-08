@@ -1,9 +1,7 @@
 use crate::eth::web3::{float_to_u256, setup_web3};
 use secp256k1::SecretKey;
-use std::str::FromStr;
-use web3::transports::Http;
+
 use web3::types::{Address, TransactionParameters, TransactionRequest, U256};
-use web3::Web3;
 
 /// works with infura - https://github.com/tomusdrw/rust-web3/issues/516
 #[tokio::main]

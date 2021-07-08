@@ -4,10 +4,9 @@
 //! The macro probably does something to the draw_body() fn which fucks with &mut state reference
 //! Basically right now not a battle worth fighting
 
-use secp256k1::SecretKey;
 use std::str::FromStr;
 use web3::transports::Http;
-use web3::types::{Address, TransactionParameters, TransactionRequest, U256};
+use web3::types::U256;
 use web3::Web3;
 
 pub mod balance;

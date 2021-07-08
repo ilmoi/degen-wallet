@@ -206,7 +206,7 @@ impl Drawable for Transaction<'_> {
             }
         }
     }
-    fn set_keybinding(&mut self, key: Key, state: &mut AppState) {
+    fn set_keybinding(&mut self, key: Key, _state: &mut AppState) {
         match key {
             Key::Char('\n') => {
                 if self.tx_state == TxState::TxDetails {

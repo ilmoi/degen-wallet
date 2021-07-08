@@ -39,7 +39,7 @@ impl Login<'_> {
         body_chunk: Rect,
         body_block: Block,
         f: &mut Frame<TermBck>,
-        state: &mut AppState,
+        _state: &mut AppState,
     ) {
         f.render_widget(body_block, body_chunk);
 
@@ -115,7 +115,7 @@ impl Drawable for Login<'_> {
             LoginState::Login => self.render_login(body_chunk, body_block, f, state),
         }
     }
-    fn set_keybinding(&mut self, key: Key, state: &mut AppState) {
+    fn set_keybinding(&mut self, key: Key, _state: &mut AppState) {
         match key {
             Key::Char('\n') => match self.login_state {
                 LoginState::GetPassword => self.login_state = LoginState::Wait,

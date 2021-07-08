@@ -12,7 +12,7 @@ use std::str::FromStr;
 use serde_json::Value;
 use web3::contract::{Contract, Options};
 use web3::transports::Http;
-use web3::types::{Address, TransactionReceipt, H256, U256};
+use web3::types::{Address, H256, U256};
 
 use crate::eth::web3::{float_to_u256, setup_web3, u256_to_float};
 use secp256k1::SecretKey;
@@ -132,7 +132,7 @@ pub async fn query_contracts(
                 let raw_balance = query_contract(&token, wallet_addr).await?;
                 let float_balance = u256_to_float(raw_balance, decimals.to_owned())?;
 
-                Ok::<((Address, String, f64)), anyhow::Error>((
+                Ok::<(Address, String, f64), anyhow::Error>((
                     wallet_addr,
                     token.to_owned(),
                     float_balance,

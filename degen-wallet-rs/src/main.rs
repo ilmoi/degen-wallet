@@ -1,12 +1,7 @@
 use degen_wallet_rs::tui::draw::draw_screen;
 
-use degen_wallet_rs::eth::wallet::external::{generate_eth_wallet, mnemonic_from_phrase};
-use degen_wallet_rs::eth::web3::contract::{query_contracts, transfer_contract_public};
-use degen_wallet_rs::eth::web3::float_to_u256;
 use std::panic;
 use std::panic::PanicInfo;
-use std::str::FromStr;
-use web3::types::H160;
 
 /// since our app is a tui, and we're inside an alt screen, normal panics won't show
 /// we need to write a custom panic hook
