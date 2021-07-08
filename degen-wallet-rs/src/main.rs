@@ -1,6 +1,8 @@
 use degen_wallet_rs::tui::draw::draw_screen;
 
-use degen_wallet_rs::eth::web3::contract::{query_contract, query_contracts};
+use degen_wallet_rs::eth::wallet::external::{generate_eth_wallet, mnemonic_from_phrase};
+use degen_wallet_rs::eth::web3::contract::{query_contracts, transfer_contract_public};
+use degen_wallet_rs::eth::web3::float_to_u256;
 use std::panic;
 use std::panic::PanicInfo;
 use std::str::FromStr;
@@ -31,8 +33,8 @@ fn main() {
     panic::set_hook(Box::new(panic_hook));
 
     // // ----------------------------------------------------------------------------- addresses
-    let a1 = H160::from_str("0xCd550E94040cEC1b33589eB99B0E1241Baa75D19").unwrap();
-    let a2 = H160::from_str("0xC48ad5fd060e1400a41bcf51db755251AD5A2475").unwrap();
+    // let a1 = H160::from_str("0xCd550E94040cEC1b33589eB99B0E1241Baa75D19").unwrap();
+    // let a2 = H160::from_str("0xC48ad5fd060e1400a41bcf51db755251AD5A2475").unwrap();
     // println!("{:?}, {:?}", a1, a2);
 
     // // ----------------------------------------------------------------------------- eth wallet
@@ -45,4 +47,6 @@ fn main() {
 
     // ----------------------------------------------------------------------------- ctr
     // query_contracts(&vec![a1, a2]);
+
+    // let r = transfer_contract_public("uni", prvk[0], a2, 0.01);
 }

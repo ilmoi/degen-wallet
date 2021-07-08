@@ -1,13 +1,37 @@
-use crate::eth::web3::{eth_to_wei, setup_web3};
+use crate::eth::web3::{float_to_u256, setup_web3};
 use secp256k1::SecretKey;
 use std::str::FromStr;
 use web3::transports::Http;
 use web3::types::{Address, TransactionParameters, TransactionRequest, U256};
 use web3::Web3;
 
+/// works with infura - https://github.com/tomusdrw/rust-web3/issues/516
+#[tokio::main]
+pub async fn send_transaction_public(
+    to: Address,
+    amount: f64,
+    prvk: &SecretKey,
+) -> anyhow::Result<String> {
+    let web3 = setup_web3()?;
+    let tx_object = TransactionParameters {
+        to: Some(to),
+        value: float_to_u256(amount, 18),
+        ..Default::default()
+    };
+
+    let signed = web3.accounts().sign_transaction(tx_object, prvk).await?;
+
+    let result = web3
+        .eth()
+        .send_raw_transaction(signed.raw_transaction)
+        .await?;
+    // println!("{}", result);
+    Ok(format!("{:?}", result))
+}
+
 /// this only works on Ganache - infura requires signed raw tx
 #[tokio::main]
-pub async fn send_tx(from: Address, to: Address) -> anyhow::Result<String> {
+pub async fn send_transaction_private(from: Address, to: Address) -> anyhow::Result<String> {
     let web3 = setup_web3()?;
     let tx_request = TransactionRequest {
         from,
@@ -24,24 +48,4 @@ pub async fn send_tx(from: Address, to: Address) -> anyhow::Result<String> {
     let result = web3.eth().send_transaction(tx_request).await?;
     // println!("{}", result);
     Ok(result.to_string())
-}
-
-/// works with infura - https://github.com/tomusdrw/rust-web3/issues/516
-#[tokio::main]
-pub async fn send_signed_tx(to: Address, amount: f64, prvk: &SecretKey) -> anyhow::Result<String> {
-    let web3 = setup_web3()?;
-    let tx_object = TransactionParameters {
-        to: Some(to),
-        value: eth_to_wei(amount),
-        ..Default::default()
-    };
-
-    let signed = web3.accounts().sign_transaction(tx_object, prvk).await?;
-
-    let result = web3
-        .eth()
-        .send_raw_transaction(signed.raw_transaction)
-        .await?;
-    // println!("{}", result);
-    Ok(format!("{:?}", result))
 }

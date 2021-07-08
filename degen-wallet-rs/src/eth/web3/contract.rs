@@ -12,21 +12,22 @@ use std::str::FromStr;
 use serde_json::Value;
 use web3::contract::{Contract, Options};
 use web3::transports::Http;
-use web3::types::{Address, U256};
+use web3::types::{Address, TransactionReceipt, H256, U256};
 
-use crate::eth::web3::{setup_web3, u256_to_float};
+use crate::eth::web3::{float_to_u256, setup_web3, u256_to_float};
+use secp256k1::SecretKey;
 
-pub fn get_token_addr(token: &str) -> anyhow::Result<Address> {
+fn get_token_addr(token: &str) -> anyhow::Result<Address> {
     let mut h = HashMap::new();
 
     // ########################## ADD MORE TOKENS HERE ##########################
     h.insert(
         "uni",
-        Address::from_str("0x1f9840a85d5af5bf1d1762f925bdaddc4201f984").unwrap(),
+        Address::from_str("0x1f9840a85d5af5bf1d1762f925bdaddc4201f984")?,
     );
     h.insert(
-        "ERC20Mintable",
-        Address::from_str("0x477369e951659C64259428E65142DBc321fD583C").unwrap(),
+        "fdai",
+        Address::from_str("0xf4beCBbFac50D4C0EdD58cc81177ad6713ACF457")?,
     );
     // ########################## ADD MORE TOKENS ^^^^ ##########################
 
@@ -37,12 +38,12 @@ pub fn get_token_addr(token: &str) -> anyhow::Result<Address> {
     Ok(addr.to_owned())
 }
 
-pub fn get_token_decimals(token: &str) -> anyhow::Result<usize> {
+fn get_token_decimals(token: &str) -> anyhow::Result<usize> {
     let mut h = HashMap::new();
 
     // ########################## ADD MORE TOKENS HERE ##########################
     h.insert("uni", 18);
-    h.insert("ERC20Mintable", 18);
+    h.insert("fdai", 18);
     // ########################## ADD MORE TOKENS ^^^^ ##########################
 
     //not great, but we can't return a ref to a dict defined inside this fn
@@ -51,6 +52,66 @@ pub fn get_token_decimals(token: &str) -> anyhow::Result<usize> {
     ))?;
     Ok(decimals.to_owned())
 }
+
+// ----------------------------------------------------------------------------- transact
+
+/// works with infura
+#[tokio::main]
+pub async fn transfer_contract_public(
+    token: &str,
+    prvk: &SecretKey,
+    to_addr: Address,
+    amount: f64,
+) -> anyhow::Result<String> {
+    let token_addr = get_token_addr(&token)?;
+    let decimals = get_token_decimals(&token)?;
+
+    let contract = instantiate_contract(token, token_addr)?;
+
+    let amount_native = float_to_u256(amount, decimals);
+
+    let receipt = contract
+        .signed_call_with_confirmations(
+            "transfer",
+            (to_addr, amount_native),
+            Options::default(),
+            1, //currently incorrectly handle the case where confirmations is set to 0 - https://github.com/tomusdrw/rust-web3/issues/195
+            prvk,
+        )
+        .await?;
+
+    Ok(format!("{:?}", receipt.transaction_hash))
+}
+
+/// only works with ganache
+#[tokio::main]
+pub async fn transfer_contract_private(
+    token: &str,
+    from_addr: Address,
+    to_addr: Address,
+    amount: f64,
+) -> anyhow::Result<H256> {
+    let token_addr = get_token_addr(&token)?;
+    let decimals = get_token_decimals(&token)?;
+
+    let contract = instantiate_contract(token, token_addr)?;
+
+    let amount_native = float_to_u256(amount, decimals);
+
+    let result = contract
+        .call(
+            "transfer",
+            (to_addr, amount_native),
+            from_addr,
+            Options::default(),
+        )
+        .await?;
+
+    println!("{}", result);
+    Ok(result)
+}
+
+// ----------------------------------------------------------------------------- query
 
 #[tokio::main]
 pub async fn query_contracts(
@@ -67,9 +128,8 @@ pub async fn query_contracts(
             // same with token - no choice but to clone()
             let token = token.clone();
             let h = tokio::spawn(async move {
-                let token_addr = get_token_addr(&token)?;
                 let decimals = get_token_decimals(&token)?;
-                let raw_balance = query_contract(&token, token_addr, wallet_addr).await?;
+                let raw_balance = query_contract(&token, wallet_addr).await?;
                 let float_balance = u256_to_float(raw_balance, decimals.to_owned())?;
 
                 Ok::<((Address, String, f64)), anyhow::Error>((
@@ -95,11 +155,10 @@ pub async fn query_contracts(
     Ok(balances)
 }
 
-pub async fn query_contract(
-    token: &str,
-    token_addr: Address,
-    wallet_addr: Address,
-) -> anyhow::Result<U256> {
+// ----------------------------------------------------------------------------- helpers
+
+async fn query_contract(token: &str, wallet_addr: Address) -> anyhow::Result<U256> {
+    let token_addr = get_token_addr(&token)?;
     let contract = instantiate_contract(token, token_addr)?;
 
     let balance: U256 = contract
@@ -110,7 +169,7 @@ pub async fn query_contract(
     Ok(balance)
 }
 
-pub fn instantiate_contract(token: &str, token_addr: Address) -> anyhow::Result<Contract<Http>> {
+fn instantiate_contract(token: &str, token_addr: Address) -> anyhow::Result<Contract<Http>> {
     let web3 = setup_web3()?;
 
     let file_content: String = read_file(&format!("src/eth/web3/tokens/{}.json", token));
@@ -123,9 +182,7 @@ pub fn instantiate_contract(token: &str, token_addr: Address) -> anyhow::Result<
     Ok(contract)
 }
 
-// ----------------------------------------------------------------------------- fs
-
-pub fn read_file(filepath: &str) -> String {
+fn read_file(filepath: &str) -> String {
     let file = File::open(filepath).expect("could not open file");
     let mut buffered_reader = BufReader::new(file);
     let mut contents = String::new();
@@ -137,7 +194,7 @@ pub fn read_file(filepath: &str) -> String {
     contents
 }
 
-pub fn extract_token_name(path: DirEntry) -> anyhow::Result<String> {
+fn extract_token_name(path: DirEntry) -> anyhow::Result<String> {
     let p = path.path().display().to_string();
     let split_slash = p.split("/");
     let file = split_slash.collect::<Vec<&str>>();

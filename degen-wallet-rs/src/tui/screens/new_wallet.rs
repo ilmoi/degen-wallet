@@ -71,7 +71,17 @@ impl NewWallet {
         self.new_wallet_state = NewWalletState::GenerateMnemonic;
     }
 
-    fn render_gen(&mut self, state: &mut AppState) {
+    fn render_gen(
+        &mut self,
+        body_chunk: Rect,
+        body_block: Block,
+        f: &mut Frame<TermBck>,
+        state: &mut AppState,
+    ) {
+        // continue to render prev screen
+        let p = Paragraph::new("Generating new wallet...").block(body_block);
+        f.render_widget(p, body_chunk);
+
         //strictly speaking don't need this if statement, but adding for extra protection
         if state.mnemonic.is_none() {
             let (mnemonic, file_uuid) = generate_and_save_mnemonic(&self.passphrase);
@@ -142,7 +152,7 @@ impl Drawable for NewWallet {
                 self.render_request_passphrase(body_chunk, body_block, f)
             }
             NewWalletState::WaitForGen => self.render_wait(body_chunk, body_block, f),
-            NewWalletState::GenerateMnemonic => self.render_gen(state),
+            NewWalletState::GenerateMnemonic => self.render_gen(body_chunk, body_block, f, state),
             NewWalletState::DisplayMnemonic => {
                 self.render_display_mnemonic(body_chunk, body_block, f, state)
             }

@@ -8,8 +8,8 @@ contract DaiTokenMock is ERC20Mintable {
     uint256 public decimals;
     
     constructor() public {
-        name = "dai stablecoin";
-        symbol = "DAI";
+        name = "fake dai";
+        symbol = "FDAI";
         decimals = 18;
     }
 }

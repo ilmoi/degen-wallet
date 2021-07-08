@@ -13,6 +13,8 @@ use tui::text::{Span, Spans};
 pub enum ImportState {
     GetMnemonic,
     GetPassphrase,
+    Wait,
+    Import,
 }
 
 pub struct Import<'a> {
@@ -106,6 +108,29 @@ impl Import<'_> {
         //set the cursor
         f.set_cursor(chunks[1].x + self.passphrase.len() as u16, chunks[1].y);
     }
+
+    fn render_wait(&mut self, body_chunk: Rect, body_block: Block, f: &mut Frame<TermBck>) {
+        let p = Paragraph::new("Importing your wallet...").block(body_block);
+        f.render_widget(p, body_chunk);
+        self.import_state = ImportState::Import;
+    }
+
+    fn render_import(
+        &mut self,
+        body_chunk: Rect,
+        body_block: Block,
+        f: &mut Frame<TermBck>,
+        state: &mut AppState,
+    ) {
+        //continue to render prev screen
+        let p = Paragraph::new("Importing your wallet...").block(body_block);
+        f.render_widget(p, body_chunk);
+
+        import_and_save_mnemonic(state.mnemonic.as_ref().unwrap(), &self.passphrase);
+        state.screen = Screen::Accounts;
+        self.import_state = ImportState::GetMnemonic; // in case we go through import twice
+        state.eth_accounts = (vec![], vec![], vec![]) //nullify existing accounts since we're gonna have new
+    }
 }
 
 impl Drawable for Import<'_> {
@@ -125,6 +150,8 @@ impl Drawable for Import<'_> {
             ImportState::GetPassphrase => {
                 self.render_get_passphrase(body_chunk, body_block, f, state);
             }
+            ImportState::Wait => self.render_wait(body_chunk, body_block, f),
+            ImportState::Import => self.render_import(body_chunk, body_block, f, state),
         }
     }
     fn set_keybinding(&mut self, key: Key, state: &mut AppState) {
@@ -141,11 +168,9 @@ impl Drawable for Import<'_> {
                     )),
                 },
                 ImportState::GetPassphrase => {
-                    import_and_save_mnemonic(state.mnemonic.as_ref().unwrap(), &self.passphrase);
-                    state.screen = Screen::Accounts;
-                    self.import_state = ImportState::GetMnemonic; // in case we go through import twice
-                    state.eth_accounts = (vec![], vec![], vec![]) //nullify existing accounts since we're gonna have new
+                    self.import_state = ImportState::Wait;
                 }
+                _ => {}
             },
             Key::Char(c) => match self.import_state {
                 ImportState::GetMnemonic => {
@@ -154,6 +179,7 @@ impl Drawable for Import<'_> {
                 ImportState::GetPassphrase => {
                     self.passphrase.push(c);
                 }
+                _ => {}
             },
             Key::Backspace => match self.import_state {
                 ImportState::GetMnemonic => {
@@ -162,6 +188,7 @@ impl Drawable for Import<'_> {
                 ImportState::GetPassphrase => {
                     self.passphrase.pop();
                 }
+                _ => {}
             },
             _ => {}
         }

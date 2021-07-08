@@ -8,13 +8,17 @@ use tui::widgets::{Block, Paragraph, Wrap};
 use tui::Frame;
 use web3::types::Address;
 
-use crate::eth::web3::transaction::send_signed_tx;
+use crate::eth::web3::contract::transfer_contract_public;
+use crate::eth::web3::transaction::send_transaction_public;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
+use secp256k1::SecretKey;
 
 #[derive(PartialEq)]
 pub enum TxState {
     TxDetails,
+    TxWait,
+    TxSend,
     TxConfirmation,
 }
 
@@ -28,11 +32,11 @@ pub struct Transaction<'a> {
 impl Transaction<'_> {
     pub fn new() -> Self {
         Self {
-            input: "0xC48ad5fd060e1400a41bcf51db755251AD5A2475, 0.123".into(),
+            input: "0xC48ad5fd060e1400a41bcf51db755251AD5A2475, eth, 0.123".into(),
             msg: vec![
                 Span::raw("Enter \"to\" address and amount, in the following format: "),
                 Span::styled(
-                    "0xC48ad5fd060e1400a41bcf51db755251AD5A2475, 0.123",
+                    "0xC48ad5fd060e1400a41bcf51db755251AD5A2475, eth, 0.123",
                     Style::default()
                         .add_modifier(Modifier::ITALIC)
                         .fg(Color::Cyan),
@@ -89,6 +93,39 @@ impl Transaction<'_> {
         f.set_cursor(chunks[1].x + self.input.len() as u16, chunks[2].y);
     }
 
+    fn render_wait(&mut self, body_chunk: Rect, body_block: Block, f: &mut Frame<TermBck>) {
+        let p = Paragraph::new("Transmitting transaction...").block(body_block);
+        f.render_widget(p, body_chunk);
+        self.tx_state = TxState::TxSend;
+    }
+
+    fn render_send(
+        &mut self,
+        body_chunk: Rect,
+        body_block: Block,
+        f: &mut Frame<TermBck>,
+        state: &mut AppState,
+    ) {
+        // continue to render prev screen
+        let p = Paragraph::new("Transmitting transaction...").block(body_block);
+        f.render_widget(p, body_chunk);
+
+        let prvk = state.eth_accounts.2[state.selected_acc];
+        let (to, token, amount) = self.parse_input().unwrap(); //ok to unwrap coz we check before entering this state
+
+        // here we triage eth and token transactions
+        if let Ok(tx_hash) = Transaction::send_eth_or_tokens(to, token, amount, &prvk) {
+            self.tx_hash = tx_hash;
+            self.tx_state = TxState::TxConfirmation
+        } else {
+            self.msg.push(Span::styled(
+                "Tx failed. Try again. ",
+                Style::default().fg(Color::Red),
+            ));
+            self.tx_state = TxState::TxDetails;
+        }
+    }
+
     pub fn render_tx_confirmation(
         &mut self,
         body_chunk: Rect,
@@ -100,8 +137,8 @@ impl Transaction<'_> {
             Span::styled("Transaction succeeded. ", Style::default().fg(Color::Green)),
             Span::raw(format!("Tx Hash: {}", self.tx_hash)),
             Span::raw(" Press "),
-            Span::styled("<Esc>", Style::default().add_modifier(Modifier::BOLD)),
-            Span::raw(" to go back. "),
+            Span::styled("<Enter>", Style::default().add_modifier(Modifier::BOLD)),
+            Span::raw(" to send another. "),
         ];
         let p = Paragraph::new(Spans::from(text))
             .block(body_block)
@@ -109,7 +146,7 @@ impl Transaction<'_> {
         f.render_widget(p, body_chunk);
     }
 
-    pub fn parse_input(&self) -> anyhow::Result<(Address, f64)> {
+    pub fn parse_input(&self) -> anyhow::Result<(Address, &str, f64)> {
         let split = self.input.split(",");
         let mut split_vec = split.collect::<Vec<&str>>();
         let amount = split_vec
@@ -117,6 +154,12 @@ impl Transaction<'_> {
             .ok_or_else(|| anyhow::anyhow!("cant pop"))?
             .trim()
             .parse::<f64>()?;
+
+        let token = split_vec
+            .pop()
+            .ok_or_else(|| anyhow::anyhow!("cant pop"))?
+            .trim();
+
         let addr = split_vec
             .pop()
             .ok_or_else(|| anyhow::anyhow!("cant pop"))?
@@ -127,7 +170,20 @@ impl Transaction<'_> {
             return Err(anyhow::anyhow!("vector should have been left empty"));
         }
 
-        Ok((addr, amount))
+        Ok((addr, token, amount))
+    }
+
+    pub fn send_eth_or_tokens(
+        to: Address,
+        token: &str,
+        amount: f64,
+        prvk: &SecretKey,
+    ) -> anyhow::Result<String> {
+        if token == "eth" {
+            send_transaction_public(to, amount, prvk)
+        } else {
+            transfer_contract_public(token, prvk, to, amount)
+        }
     }
 }
 
@@ -143,6 +199,8 @@ impl Drawable for Transaction<'_> {
 
         match self.tx_state {
             TxState::TxDetails => self.render_tx_details(body_chunk, body_block, f, state),
+            TxState::TxWait => self.render_wait(body_chunk, body_block, f),
+            TxState::TxSend => self.render_send(body_chunk, body_block, f, state),
             TxState::TxConfirmation => {
                 self.render_tx_confirmation(body_chunk, body_block, f, state)
             }
@@ -152,23 +210,16 @@ impl Drawable for Transaction<'_> {
         match key {
             Key::Char('\n') => {
                 if self.tx_state == TxState::TxDetails {
-                    if let Ok((to, amount)) = self.parse_input() {
-                        let prvk = state.eth_accounts.2[state.selected_acc];
-                        if let Ok(tx_hash) = send_signed_tx(to, amount, &prvk) {
-                            self.tx_hash = tx_hash;
-                            self.tx_state = TxState::TxConfirmation
-                        } else {
-                            self.msg.push(Span::styled(
-                                "Tx failed. Try again. ",
-                                Style::default().fg(Color::Red),
-                            ))
-                        }
+                    if let Ok((_to, _token, _amount)) = self.parse_input() {
+                        self.tx_state = TxState::TxWait;
                     } else {
                         self.msg.push(Span::styled(
                             "Bad input. Try again. ",
                             Style::default().fg(Color::Red),
                         ))
                     }
+                } else if self.tx_state == TxState::TxConfirmation {
+                    self.tx_state = TxState::TxDetails
                 }
             }
             Key::Char(c) => {

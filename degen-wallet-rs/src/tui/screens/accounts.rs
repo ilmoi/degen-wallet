@@ -7,7 +7,7 @@ use tui::Frame;
 use crate::eth::wallet::domain::StrAddr;
 use crate::eth::wallet::external::generate_eth_wallet;
 use crate::eth::web3::balance::get_balances;
-use crate::eth::web3::contract::{query_contract, query_contracts};
+use crate::eth::web3::contract::query_contracts;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::StatefulTable;
@@ -27,7 +27,7 @@ impl Accounts {
     }
 
     pub fn update_balances(&mut self, state: &mut AppState) {
-        let eth_balances = get_balances(&state.eth_accounts.0);
+        let eth_balances = get_balances(&state.eth_accounts.0).unwrap();
         let token_balances = query_contracts(&state.eth_accounts.0).unwrap();
 
         //todo tried making this async / putting on another thread but problem with mutexes
