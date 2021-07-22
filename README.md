@@ -21,16 +21,25 @@ TUI-based wallet for both Ethereum and Solana. Built for fun and no profit.
 
 # What it does
 
-Let's you create a new mnemonic
-![](https://media.giphy.com/media/7W47RXYCopdjtopVQS/giphy.gif)
+- Let's you create a new wallet with a fresh mnemonic
 
-Let's you import and existing
+![](https://i.imgur.com/zpPDxuY.gif)
 
-Saves it as a keystore file & let's you login back later
+- Let's you import an existing one
 
-Let's you transact in eth and erc20 tokens
+![](https://i.imgur.com/U93qDPc.gif)
 
-Let's you transact in sol and spl tokens
+- Saves it as a keystore file & let's you login back later
+
+![](https://i.imgur.com/umGSbn3.gif)
+
+- Let's you transact in eth and erc20 tokens
+
+![](https://i.imgur.com/Sn22Uxj.gif)
+
+- Let's you transact in sol and spl tokens
+
+![](https://i.imgur.com/2GPn5gM.gif)
 
 # Use
 ```asm
