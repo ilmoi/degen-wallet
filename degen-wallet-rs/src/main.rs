@@ -1,11 +1,6 @@
-use degen_wallet_rs::tui::draw::draw_screen;
+use std::{panic, panic::PanicInfo};
 
-use degen_wallet_rs::sol::client::program::{query_program, transfer_spl_token};
-use degen_wallet_rs::sol::client::transaction::send_sol;
-use solana_sdk::pubkey::Pubkey;
-use std::panic;
-use std::panic::PanicInfo;
-use std::str::FromStr;
+use degen_wallet_rs::tui::draw::draw_screen;
 
 /// since our app is a tui, and we're inside an alt screen, normal panics won't show
 /// we need to write a custom panic hook

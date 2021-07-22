@@ -3,16 +3,17 @@
 //! 2) add its decimal places to the hashmap in get_sol_token_decimals
 //! 3) add the name to the TOKENS const at the top
 
-use crate::sol::client::{float_to_u64, setup_solana_client, u64_to_float};
-use solana_sdk::program_pack::Pack;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signer::keypair::Keypair;
-use solana_sdk::signer::Signer;
-use solana_sdk::transaction::Transaction;
+use std::{borrow::Borrow, collections::HashMap, str::FromStr};
+
+use solana_sdk::{
+    program_pack::Pack,
+    pubkey::Pubkey,
+    signer::{keypair::Keypair, Signer},
+    transaction::Transaction,
+};
 use spl_token::instruction::transfer;
-use std::borrow::Borrow;
-use std::collections::HashMap;
-use std::str::FromStr;
+
+use crate::sol::client::{float_to_u64, setup_solana_client, u64_to_float};
 
 // a little bit easier to manage than eth
 // since spl_token is a standartized program - we don't need to import the abi of each token
@@ -132,7 +133,7 @@ pub fn ensure_assoc_acc_exists(
             &[&*payer],
             client.get_recent_blockhash()?.0,
         );
-        let r = client.send_transaction(&tx)?;
+        let _r = client.send_transaction(&tx)?;
         // println!("assoc account created with signature: {}", r);
     };
 

@@ -1,6 +1,5 @@
 use bip39::{Mnemonic, Seed};
 use solana_sdk::signature::Signer;
-use std::convert::TryInto;
 
 pub fn generate_sol_wallet(
     mnemonic: &Mnemonic,

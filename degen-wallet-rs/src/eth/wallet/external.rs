@@ -1,11 +1,11 @@
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use bip39::{Language, Mnemonic, MnemonicType, Seed};
-
 use eth_keystore::{decrypt_key, encrypt_key};
 use hdpath::{Purpose, StandardHDPath};
-
 use web3::types::Address;
 
 use crate::eth::wallet::internal::{

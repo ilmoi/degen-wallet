@@ -1,14 +1,20 @@
 use termion::event::Key;
-use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::widgets::{Block, Paragraph, Wrap};
-use tui::Frame;
+use tui::{
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{Block, Paragraph, Wrap},
+    Frame,
+};
 
-use crate::eth::wallet::external::{import_and_save_mnemonic, mnemonic_from_phrase};
-use crate::tui::helpers::TermBck;
-use crate::tui::screens::import::ImportState::GetMnemonic;
-use crate::tui::state::{AppState, Drawable, Screen};
-use tui::style::{Color, Modifier, Style};
-use tui::text::{Span, Spans};
+use crate::{
+    eth::wallet::external::{import_and_save_mnemonic, mnemonic_from_phrase},
+    tui::{
+        helpers::TermBck,
+        screens::import::ImportState::GetMnemonic,
+        state::{AppState, Drawable, Screen},
+    },
+};
 
 pub enum ImportState {
     GetMnemonic,

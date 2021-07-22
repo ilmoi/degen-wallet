@@ -2,20 +2,16 @@ use std::collections::HashMap;
 
 use bip39::Mnemonic;
 use termion::event::Key;
-use tui::layout::Rect;
-use tui::widgets::Block;
-use tui::Frame;
-
-use crate::tui::helpers::TermBck;
-use crate::tui::screens::accounts::Accounts;
-use crate::tui::screens::coin::Coin;
-use crate::tui::screens::eth_transaction::EthTransaction;
-use crate::tui::screens::import::Import;
-use crate::tui::screens::login::Login;
-use crate::tui::screens::new_wallet::NewWallet;
-use crate::tui::screens::sol_transaction::SolTransaction;
-use crate::tui::screens::welcome::Welcome;
+use tui::{layout::Rect, widgets::Block, Frame};
 use web3::types::Address;
+
+use crate::tui::{
+    helpers::TermBck,
+    screens::{
+        accounts::Accounts, coin::Coin, eth_transaction::EthTransaction, import::Import,
+        login::Login, new_wallet::NewWallet, sol_transaction::SolTransaction, welcome::Welcome,
+    },
+};
 
 // ----------------------------------------------------------------------------- app state
 

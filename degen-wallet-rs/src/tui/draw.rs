@@ -3,9 +3,11 @@ use std::error::Error;
 use termion::event::Key;
 use tui::widgets::{Block, Borders};
 
-use crate::tui::helpers::{draw_standard_grid, init_terminal};
-use crate::tui::state::{AppState, Drawable, Screen};
-use crate::tui::util::event::{Event, Events};
+use crate::tui::{
+    helpers::{draw_standard_grid, init_terminal},
+    state::{AppState, Drawable, Screen},
+    util::event::{Event, Events},
+};
 
 pub fn draw_screen() -> Result<(), Box<dyn Error>> {
     let mut terminal = init_terminal().unwrap();

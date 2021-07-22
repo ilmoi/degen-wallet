@@ -1,6 +1,6 @@
-use bitcoin::hashes::hex::ToHex;
-
 use std::fmt::LowerHex;
+
+use bitcoin::hashes::hex::ToHex;
 use web3::types::H160;
 
 //the below got replaced with web3::types::Address

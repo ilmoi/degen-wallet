@@ -1,8 +1,9 @@
-use std::io::Stdout;
-use std::{error::Error, io};
+use std::{error::Error, io, io::Stdout};
 
-use termion::raw::RawTerminal;
-use termion::{raw::IntoRawMode, screen::AlternateScreen};
+use termion::{
+    raw::{IntoRawMode, RawTerminal},
+    screen::AlternateScreen,
+};
 use tui::{
     backend::TermionBackend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},

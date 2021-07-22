@@ -1,8 +1,11 @@
 pub mod event;
 
-use rand::distributions::{Distribution, Uniform};
-use rand::rngs::ThreadRng;
 use std::collections::BTreeMap;
+
+use rand::{
+    distributions::{Distribution, Uniform},
+    rngs::ThreadRng,
+};
 use tui::widgets::{ListState, TableState};
 
 #[derive(Clone)]

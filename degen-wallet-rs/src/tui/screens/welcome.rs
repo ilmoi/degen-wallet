@@ -1,17 +1,20 @@
 use termion::event::Key;
-use tui::layout::Rect;
-use tui::style::{Color, Style};
-use tui::text::Span;
-use tui::widgets::{Block, List, ListItem};
-use tui::Frame;
+use tui::{
+    layout::Rect,
+    style::{Color, Style},
+    text::Span,
+    widgets::{Block, List, ListItem},
+    Frame,
+};
 
-use crate::eth::wallet::external::get_key_path;
-use crate::sol::client::balance::get_sol_balances;
-use crate::sol::client::program::query_programs;
-use crate::sol::wallet::external::generate_sol_wallet;
-use crate::tui::helpers::TermBck;
-use crate::tui::state::{AppState, Drawable, Screen};
-use crate::tui::util::ListApp;
+use crate::{
+    eth::wallet::external::get_key_path,
+    tui::{
+        helpers::TermBck,
+        state::{AppState, Drawable, Screen},
+        util::ListApp,
+    },
+};
 
 pub struct Welcome<'a> {
     pub list_app: ListApp<'a>,

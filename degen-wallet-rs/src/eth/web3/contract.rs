@@ -3,19 +3,23 @@
 //! 2) add its decimal places to the hashmap in get_token_decimals
 //! 3) add the json abi to src/eth/web3/tokens dir
 
-use std::collections::HashMap;
-use std::fs;
-use std::fs::{DirEntry, File};
-use std::io::{BufReader, Read};
-use std::str::FromStr;
+use std::{
+    collections::HashMap,
+    fs,
+    fs::{DirEntry, File},
+    io::{BufReader, Read},
+    str::FromStr,
+};
 
+use secp256k1::SecretKey;
 use serde_json::Value;
-use web3::contract::{Contract, Options};
-use web3::transports::Http;
-use web3::types::{Address, H256, U256};
+use web3::{
+    contract::{Contract, Options},
+    transports::Http,
+    types::{Address, H256, U256},
+};
 
 use crate::eth::web3::{float_to_u256, setup_web3, u256_to_float};
-use secp256k1::SecretKey;
 
 fn get_token_addr(token: &str) -> anyhow::Result<Address> {
     let mut h = HashMap::new();

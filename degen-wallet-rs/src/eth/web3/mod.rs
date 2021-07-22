@@ -5,9 +5,8 @@
 //! Basically right now not a battle worth fighting
 
 use std::str::FromStr;
-use web3::transports::Http;
-use web3::types::U256;
-use web3::Web3;
+
+use web3::{transports::Http, types::U256, Web3};
 
 pub mod balance;
 pub mod contract;

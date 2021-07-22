@@ -1,20 +1,28 @@
-use termion::event::Key;
-use tui::layout::{Constraint, Rect};
-use tui::style::{Color, Modifier, Style};
-use tui::widgets::{Block, Cell, Row, Table};
-use tui::Frame;
-
-use crate::eth::wallet::domain::StrAddr;
-use crate::eth::wallet::external::generate_eth_wallet;
-use crate::eth::web3::balance::get_balances;
-use crate::eth::web3::contract::query_contracts;
-use crate::sol::client::balance::get_sol_balances;
-use crate::sol::client::program::query_programs;
-use crate::sol::wallet::external::generate_sol_wallet;
-use crate::tui::helpers::TermBck;
-use crate::tui::state::{AppState, Drawable, Screen, SelectedCoin};
-use crate::tui::util::StatefulTable;
 use std::collections::BTreeMap;
+
+use termion::event::Key;
+use tui::{
+    layout::{Constraint, Rect},
+    style::{Color, Modifier, Style},
+    widgets::{Block, Cell, Row, Table},
+    Frame,
+};
+
+use crate::{
+    eth::{
+        wallet::{domain::StrAddr, external::generate_eth_wallet},
+        web3::{balance::get_balances, contract::query_contracts},
+    },
+    sol::{
+        client::{balance::get_sol_balances, program::query_programs},
+        wallet::external::generate_sol_wallet,
+    },
+    tui::{
+        helpers::TermBck,
+        state::{AppState, Drawable, Screen, SelectedCoin},
+        util::StatefulTable,
+    },
+};
 
 pub struct Accounts {
     pub account_table: StatefulTable,

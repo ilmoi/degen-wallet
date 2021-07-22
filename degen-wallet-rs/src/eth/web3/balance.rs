@@ -1,6 +1,6 @@
-use crate::eth::web3::{setup_web3, u256_to_float};
-
 use web3::types::Address;
+
+use crate::eth::web3::{setup_web3, u256_to_float};
 
 #[tokio::main]
 pub async fn get_balances(addresses: &Vec<Address>) -> anyhow::Result<Vec<f64>> {

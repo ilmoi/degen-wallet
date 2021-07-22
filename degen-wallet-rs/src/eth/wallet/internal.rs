@@ -1,11 +1,8 @@
-use std::path::Path;
-use std::str::FromStr;
-use std::{fs, io};
+use std::{fs, io, path::Path, str::FromStr};
 
-use bitcoin::util::bip32::ExtendedPubKey;
 use bitcoin::{
     network::constants::Network,
-    util::bip32::{DerivationPath, ExtendedPrivKey},
+    util::bip32::{DerivationPath, ExtendedPrivKey, ExtendedPubKey},
     PublicKey,
 };
 use hdpath::StandardHDPath;

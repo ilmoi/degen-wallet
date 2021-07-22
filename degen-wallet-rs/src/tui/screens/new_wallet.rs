@@ -1,14 +1,20 @@
 use termion::event::Key;
-use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::style::{Color, Modifier, Style};
-use tui::text::{Span, Spans};
-use tui::widgets::{Block, Clear, Paragraph, Wrap};
-use tui::Frame;
+use tui::{
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{Block, Clear, Paragraph, Wrap},
+    Frame,
+};
 
-use crate::eth::wallet::external::generate_and_save_mnemonic;
-use crate::tui::helpers::TermBck;
-use crate::tui::screens::new_wallet::NewWalletState::RequestPassword;
-use crate::tui::state::{AppState, Drawable, Screen};
+use crate::{
+    eth::wallet::external::generate_and_save_mnemonic,
+    tui::{
+        helpers::TermBck,
+        screens::new_wallet::NewWalletState::RequestPassword,
+        state::{AppState, Drawable, Screen},
+    },
+};
 
 pub enum NewWalletState {
     RequestPassword,

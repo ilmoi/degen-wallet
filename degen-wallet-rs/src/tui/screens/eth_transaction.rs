@@ -1,18 +1,23 @@
 use std::str::FromStr;
 
+use secp256k1::SecretKey;
 use termion::event::Key;
-use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::style::{Color, Modifier, Style};
-use tui::text::{Span, Spans};
-use tui::widgets::{Block, Paragraph, Wrap};
-use tui::Frame;
+use tui::{
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{Block, Paragraph, Wrap},
+    Frame,
+};
 use web3::types::Address;
 
-use crate::eth::web3::contract::transfer_contract_public;
-use crate::eth::web3::transaction::send_transaction_public;
-use crate::tui::helpers::TermBck;
-use crate::tui::state::{AppState, Drawable, Screen};
-use secp256k1::SecretKey;
+use crate::{
+    eth::web3::{contract::transfer_contract_public, transaction::send_transaction_public},
+    tui::{
+        helpers::TermBck,
+        state::{AppState, Drawable, Screen},
+    },
+};
 
 #[derive(PartialEq)]
 pub enum TxState {

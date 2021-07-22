@@ -1,13 +1,19 @@
 use termion::event::Key;
-use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::widgets::{Block, Paragraph, Wrap};
-use tui::Frame;
+use tui::{
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{Block, Paragraph, Wrap},
+    Frame,
+};
 
-use crate::eth::wallet::external::decrypt_keystore_file;
-use crate::tui::helpers::TermBck;
-use crate::tui::state::{AppState, Drawable, Screen};
-use tui::style::{Color, Modifier, Style};
-use tui::text::{Span, Spans};
+use crate::{
+    eth::wallet::external::decrypt_keystore_file,
+    tui::{
+        helpers::TermBck,
+        state::{AppState, Drawable, Screen},
+    },
+};
 
 pub enum LoginState {
     GetPassword,

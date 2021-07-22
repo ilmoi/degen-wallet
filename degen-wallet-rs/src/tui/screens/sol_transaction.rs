@@ -1,20 +1,22 @@
 use std::str::FromStr;
 
+use solana_sdk::{pubkey::Pubkey, signer::keypair::Keypair};
 use termion::event::Key;
-use tui::layout::{Constraint, Direction, Layout, Rect};
-use tui::style::{Color, Modifier, Style};
-use tui::text::{Span, Spans};
-use tui::widgets::{Block, Paragraph, Wrap};
-use tui::Frame;
-use web3::types::Address;
+use tui::{
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::{Block, Paragraph, Wrap},
+    Frame,
+};
 
-use crate::sol::client::program::transfer_spl_token;
-use crate::sol::client::transaction::send_sol;
-use crate::tui::helpers::TermBck;
-use crate::tui::state::{AppState, Drawable, Screen};
-use secp256k1::SecretKey;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signer::keypair::Keypair;
+use crate::{
+    sol::client::{program::transfer_spl_token, transaction::send_sol},
+    tui::{
+        helpers::TermBck,
+        state::{AppState, Drawable, Screen},
+    },
+};
 
 #[derive(PartialEq)]
 pub enum TxState {
