@@ -25,6 +25,7 @@ pub fn generate_eth_wallet(
     Vec<secp256k1::PublicKey>,
     Vec<secp256k1::SecretKey>,
 ) {
+    // ----------------------------------------------------------------------------- 1 seed (bip 39)
     // seed vs entropy
     // seed = entropy that went through 2048 repeated rounds of HMAC-SHA256 hashing as described here https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#from-mnemonic-to-seed
     // use seed, NOT entropy for private key calc - https://github.com/rust-bitcoin/rust-secp256k1/issues/321
@@ -33,7 +34,7 @@ pub fn generate_eth_wallet(
     // println!("Seed: {:X}", seed);
     // println!("Seed as bytes: {:?}", seed_bytes.len());
 
-    // ----------------------------------------------------------------------------- 1 deterministic wallet
+    // ----------------------------------------------------------------------------- 2 deterministic wallet (bip 32)
     // NOTE: we need to use the left 32 bytes of the seed for deterministic wallet derivation More:
     // https://github.com/rust-bitcoin/rust-secp256k1/issues/321
     // "Split I into two 32-byte sequences, IL and IR." - https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
@@ -41,14 +42,14 @@ pub fn generate_eth_wallet(
     // let deterministic_prvk = secp256k1::SecretKey::from_slice(&seed_bytes[..32]).unwrap();
     // let deterministic_pubk = secp256k1::PublicKey::from_secret_key(&secp, &deterministic_prvk);
     // let deterministic_addr = pubk_to_addr(deterministic_pubk);
-    // println!(
+    // // println!(
     //     "addr: {:?}, pubk: {}, prvk: {}",
     //     deterministic_addr, deterministic_pubk, deterministic_prvk
     // );
 
     // √ verify against https://www.myetherwallet.com/access-my-wallet
 
-    // ----------------------------------------------------------------------------- 2 HD wallet
+    // ----------------------------------------------------------------------------- 3 HD wallet (bip 32 + bip 44)
     let mut private_keys = vec![];
     let mut public_keys = vec![];
     let mut derived_eth_addresses = vec![];

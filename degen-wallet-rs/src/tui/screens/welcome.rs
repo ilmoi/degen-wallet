@@ -6,20 +6,23 @@ use tui::widgets::{Block, List, ListItem};
 use tui::Frame;
 
 use crate::eth::wallet::external::get_key_path;
+use crate::sol::client::balance::get_sol_balances;
+use crate::sol::client::program::query_programs;
+use crate::sol::wallet::external::generate_sol_wallet;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use crate::tui::util::ListApp;
 
 pub struct Welcome<'a> {
     pub list_app: ListApp<'a>,
-    pub trigger_new: bool,
+    // pub trigger_new: bool,
 }
 
 impl<'a> Welcome<'a> {
     pub fn new() -> Self {
         Self {
             list_app: ListApp::new(vec!["create new", "import existing"]),
-            trigger_new: false,
+            // trigger_new: false,
         }
     }
 }

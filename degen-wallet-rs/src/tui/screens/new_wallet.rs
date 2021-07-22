@@ -166,8 +166,7 @@ impl Drawable for NewWallet {
                     state.mnemonic = None; //need to clear any previous mnemonics from logging in
                 }
                 NewWalletState::DisplayMnemonic => {
-                    state.screen = Screen::Accounts;
-                    state.eth_accounts = (vec![], vec![], vec![]) //nullify existing accounts since we're gonna have new
+                    state.screen = Screen::Coin;
                 }
                 _ => {}
             },

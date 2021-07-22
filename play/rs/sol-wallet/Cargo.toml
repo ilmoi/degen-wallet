@@ -1,0 +1,21 @@
+[package]
+name = "sol-wallet"
+version = "0.1.0"
+authors = ["ilmoi <iljamoi@protonmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bitcoin = "0.27.0"
+hex = "0.4.3"
+secp256k1 = "0.20.3"
+sha3 = "0.9.1"
+tiny-bip39 = "0.8.0"
+web3 = "0.16.0"
+hdpath = { version="0.6.0", features=["with-bitcoin"] }
+ed25519-dalek = "1.0.1"
+rand = "0.8.4"
+bs58 = "0.4.0"
+solana-sdk = "1.7.6"
+spl-associated-token-account = "1.0.3"

@@ -3,7 +3,7 @@ use bitcoin::hashes::hex::ToHex;
 use std::fmt::LowerHex;
 use web3::types::H160;
 
-//todo the below got replaced with web3::types::Address
+//the below got replaced with web3::types::Address
 
 // #[derive(Debug, Serialize, Deserialize, Clone)]
 // pub struct EthAddr(String);

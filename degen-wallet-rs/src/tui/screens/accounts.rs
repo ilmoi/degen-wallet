@@ -8,8 +8,11 @@ use crate::eth::wallet::domain::StrAddr;
 use crate::eth::wallet::external::generate_eth_wallet;
 use crate::eth::web3::balance::get_balances;
 use crate::eth::web3::contract::query_contracts;
+use crate::sol::client::balance::get_sol_balances;
+use crate::sol::client::program::query_programs;
+use crate::sol::wallet::external::generate_sol_wallet;
 use crate::tui::helpers::TermBck;
-use crate::tui::state::{AppState, Drawable, Screen};
+use crate::tui::state::{AppState, Drawable, Screen, SelectedCoin};
 use crate::tui::util::StatefulTable;
 use std::collections::BTreeMap;
 
@@ -27,33 +30,63 @@ impl Accounts {
     }
 
     pub fn update_balances(&mut self, state: &mut AppState) {
-        let eth_balances = get_balances(&state.eth_accounts.0).unwrap();
-        let token_balances = query_contracts(&state.eth_accounts.0).unwrap();
+        match state.selected_coin {
+            SelectedCoin::Eth => {
+                let balances = get_balances(&state.eth_accounts.0).unwrap();
+                let token_balances = query_contracts(&state.eth_accounts.0).unwrap();
 
-        //todo tried making this async / putting on another thread but problem with mutexes
-        // asked - https://stackoverflow.com/questions/68254268/concurrency-in-a-rust-tui-app-lock-starvation-issue
-        // I think the solution is either RefCell or channels. Decided to leave for now
-        self.account_table.items = state
-            .eth_accounts
-            .0
-            .iter()
-            .enumerate()
-            .map(|(i, a)| {
-                // add eth balance
-                let mut h: BTreeMap<String, f64> = BTreeMap::new();
-                h.insert("eth".into(), eth_balances[i]);
+                //todo tried making this async / putting on another thread but problem with mutexes
+                // asked - https://stackoverflow.com/questions/68254268/concurrency-in-a-rust-tui-app-lock-starvation-issue
+                // I think the solution is either RefCell or channels. Decided to leave for now
+                self.account_table.items = state
+                    .eth_accounts
+                    .0
+                    .iter()
+                    .enumerate()
+                    .map(|(i, a)| {
+                        // add eth balance
+                        let mut h: BTreeMap<String, f64> = BTreeMap::new();
+                        h.insert("eth".into(), balances[i]);
 
-                // add token balance
-                let relevant_h_with_tokens = token_balances.get(&a).unwrap();
-                h.extend(
-                    relevant_h_with_tokens
-                        .into_iter()
-                        .map(|(k, v)| (k.clone(), v.clone())),
-                );
+                        // add token balance
+                        let relevant_h_with_tokens = token_balances.get(&a).unwrap();
+                        h.extend(
+                            relevant_h_with_tokens
+                                .into_iter()
+                                .map(|(k, v)| (k.clone(), v.clone())),
+                        );
 
-                (a.to_str_addr(), h)
-            })
-            .collect();
+                        (a.to_str_addr(), h)
+                    })
+                    .collect();
+            }
+            SelectedCoin::Sol => {
+                let balances = get_sol_balances(&state.sol_accounts.0).unwrap();
+                let token_balances = query_programs(&state.sol_accounts.0).unwrap();
+
+                self.account_table.items = state
+                    .sol_accounts
+                    .0
+                    .iter()
+                    .enumerate()
+                    .map(|(i, a)| {
+                        // add sol balance
+                        let mut h: BTreeMap<String, f64> = BTreeMap::new();
+                        h.insert("sol".into(), balances[i]);
+
+                        // add token balance
+                        let relevant_h_with_tokens = token_balances.get(&a).unwrap();
+                        h.extend(
+                            relevant_h_with_tokens
+                                .into_iter()
+                                .map(|(k, v)| (k.clone(), v.clone())),
+                        );
+
+                        (a.to_string(), h)
+                    })
+                    .collect();
+            }
+        };
     }
 }
 
@@ -67,14 +100,25 @@ impl Drawable for Accounts {
     ) {
         state.prev_screen = Screen::Welcome;
 
-        if state.eth_accounts.0.len() == 0 {
-            state.eth_accounts = generate_eth_wallet(state.mnemonic.as_ref().unwrap());
-            self.update_balances(state);
+        // populate the accounts on 1st render
+        match state.selected_coin {
+            SelectedCoin::Eth => {
+                if state.eth_accounts.0.len() == 0 {
+                    state.eth_accounts = generate_eth_wallet(state.mnemonic.as_ref().unwrap());
+                    self.update_balances(state);
+                }
+            }
+            SelectedCoin::Sol => {
+                if state.sol_accounts.0.len() == 0 {
+                    state.sol_accounts = generate_sol_wallet(state.mnemonic.as_ref().unwrap());
+                    self.update_balances(state);
+                }
+            }
         }
 
-        // refresh balances once every 10 seconds
+        // refresh balances once every 3 seconds
         self.refresh_count += 1;
-        if self.refresh_count >= 200 {
+        if self.refresh_count >= 100 {
             self.update_balances(state);
             self.refresh_count = 0;
         }
@@ -126,7 +170,14 @@ impl Drawable for Accounts {
         match key {
             Key::Char('\n') => {
                 state.selected_acc = self.account_table.state.selected().unwrap_or(0);
-                state.screen = Screen::Transaction;
+                match state.selected_coin {
+                    SelectedCoin::Eth => {
+                        state.screen = Screen::EthTransaction;
+                    }
+                    SelectedCoin::Sol => {
+                        state.screen = Screen::SolTransaction;
+                    }
+                }
             }
             Key::Down => {
                 self.account_table.next();

@@ -8,11 +8,13 @@ use tui::widgets::{Block, Paragraph, Wrap};
 use tui::Frame;
 use web3::types::Address;
 
-use crate::eth::web3::contract::transfer_contract_public;
-use crate::eth::web3::transaction::send_transaction_public;
+use crate::sol::client::program::transfer_spl_token;
+use crate::sol::client::transaction::send_sol;
 use crate::tui::helpers::TermBck;
 use crate::tui::state::{AppState, Drawable, Screen};
 use secp256k1::SecretKey;
+use solana_sdk::pubkey::Pubkey;
+use solana_sdk::signer::keypair::Keypair;
 
 #[derive(PartialEq)]
 pub enum TxState {
@@ -22,21 +24,21 @@ pub enum TxState {
     TxConfirmation,
 }
 
-pub struct Transaction<'a> {
+pub struct SolTransaction<'a> {
     pub input: String,
     pub msg: Vec<Span<'a>>,
     pub tx_state: TxState,
     pub tx_hash: String,
 }
 
-impl Transaction<'_> {
+impl SolTransaction<'_> {
     pub fn new() -> Self {
         Self {
-            input: "0xC48ad5fd060e1400a41bcf51db755251AD5A2475, eth, 0.123".into(),
+            input: "6X46UvyMhWgUuMoPDquZo19mvL6r8puN771FERHJc3Nn, sol, 0.123".into(),
             msg: vec![
                 Span::raw("Enter \"to\" address and amount, in the following format: "),
                 Span::styled(
-                    "0xC48ad5fd060e1400a41bcf51db755251AD5A2475, eth, 0.123",
+                    "6X46UvyMhWgUuMoPDquZo19mvL6r8puN771FERHJc3Nn, sol, 0.123",
                     Style::default()
                         .add_modifier(Modifier::ITALIC)
                         .fg(Color::Cyan),
@@ -71,7 +73,7 @@ impl Transaction<'_> {
 
         let text = Span::raw(format!(
             "Sending from {}",
-            state.eth_accounts.0[state.selected_acc]
+            state.sol_accounts.0[state.selected_acc]
         ));
         let p = Paragraph::new(Spans::from(text)).wrap(Wrap { trim: true });
         f.render_widget(p, chunks[0]);
@@ -110,11 +112,11 @@ impl Transaction<'_> {
         let p = Paragraph::new("Transmitting transaction...").block(body_block);
         f.render_widget(p, body_chunk);
 
-        let prvk = state.eth_accounts.2[state.selected_acc];
+        let payer = &state.sol_accounts.1[state.selected_acc];
         let (to, token, amount) = self.parse_input().unwrap(); //ok to unwrap coz we check before entering this state
 
-        // here we triage eth and token transactions
-        if let Ok(tx_hash) = Transaction::send_eth_or_tokens(to, token, amount, &prvk) {
+        // here we triage sol and token transactions
+        if let Ok(tx_hash) = SolTransaction::send_sol_or_tokens(&to, token, amount, &payer) {
             self.tx_hash = tx_hash;
             self.tx_state = TxState::TxConfirmation
         } else {
@@ -146,7 +148,7 @@ impl Transaction<'_> {
         f.render_widget(p, body_chunk);
     }
 
-    pub fn parse_input(&self) -> anyhow::Result<(Address, &str, f64)> {
+    pub fn parse_input(&self) -> anyhow::Result<(Pubkey, &str, f64)> {
         let split = self.input.split(",");
         let mut split_vec = split.collect::<Vec<&str>>();
         let amount = split_vec
@@ -164,7 +166,7 @@ impl Transaction<'_> {
             .pop()
             .ok_or_else(|| anyhow::anyhow!("cant pop"))?
             .trim();
-        let addr = Address::from_str(addr)?;
+        let addr = Pubkey::from_str(addr)?;
 
         if split_vec.len() != 0 {
             return Err(anyhow::anyhow!("vector should have been left empty"));
@@ -173,21 +175,21 @@ impl Transaction<'_> {
         Ok((addr, token, amount))
     }
 
-    pub fn send_eth_or_tokens(
-        to: Address,
+    pub fn send_sol_or_tokens(
+        to: &Pubkey,
         token: &str,
         amount: f64,
-        prvk: &SecretKey,
+        payer: &Keypair,
     ) -> anyhow::Result<String> {
-        if token == "eth" {
-            send_transaction_public(to, amount, prvk)
+        if token == "sol" {
+            send_sol(to, amount, payer)
         } else {
-            transfer_contract_public(token, prvk, to, amount)
+            transfer_spl_token(token, payer, to, amount)
         }
     }
 }
 
-impl Drawable for Transaction<'_> {
+impl Drawable for SolTransaction<'_> {
     fn draw_body(
         &mut self,
         body_chunk: Rect,

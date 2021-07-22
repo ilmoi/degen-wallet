@@ -27,5 +27,5 @@ async fn get_balance(address: Address) -> anyhow::Result<f64> {
     let web3 = setup_web3()?;
     //requires an actual address, not a reference (not ideal)
     let balance = web3.eth().balance(address, None).await?;
-    Ok(u256_to_float(balance, 18)?)
+    u256_to_float(balance, 18)
 }

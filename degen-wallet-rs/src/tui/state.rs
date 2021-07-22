@@ -8,14 +8,21 @@ use tui::Frame;
 
 use crate::tui::helpers::TermBck;
 use crate::tui::screens::accounts::Accounts;
+use crate::tui::screens::coin::Coin;
+use crate::tui::screens::eth_transaction::EthTransaction;
 use crate::tui::screens::import::Import;
 use crate::tui::screens::login::Login;
 use crate::tui::screens::new_wallet::NewWallet;
-use crate::tui::screens::transaction::Transaction;
+use crate::tui::screens::sol_transaction::SolTransaction;
 use crate::tui::screens::welcome::Welcome;
 use web3::types::Address;
 
 // ----------------------------------------------------------------------------- app state
+
+pub enum SelectedCoin {
+    Eth,
+    Sol,
+}
 
 pub struct AppState {
     pub screen: Screen,
@@ -27,6 +34,12 @@ pub struct AppState {
         Vec<secp256k1::PublicKey>,
         Vec<secp256k1::SecretKey>,
     ),
+    pub sol_accounts: (
+        // in solana pubkey and address are the same so there's no need for 3 arrays
+        Vec<solana_sdk::pubkey::Pubkey>,
+        Vec<solana_sdk::signer::keypair::Keypair>, //decided to use keypair instead of secret key, as latter is a reference and I cba
+    ),
+    pub selected_coin: SelectedCoin,
     pub selected_acc: usize,
 }
 
@@ -38,6 +51,8 @@ impl AppState {
             mnemonic: None,
             file_uuid: None,
             eth_accounts: (vec![], vec![], vec![]),
+            sol_accounts: (vec![], vec![]),
+            selected_coin: SelectedCoin::Eth,
             selected_acc: 0,
         }
     }
@@ -52,7 +67,9 @@ pub enum Screen {
     ImportWallet,
     Login,
     Accounts,
-    Transaction,
+    EthTransaction,
+    SolTransaction,
+    Coin,
 }
 
 impl Screen {
@@ -75,7 +92,9 @@ impl Screen {
         h.insert(Screen::Accounts, Box::new(Accounts::new()));
         h.insert(Screen::ImportWallet, Box::new(Import::new()));
         h.insert(Screen::Login, Box::new(Login::new()));
-        h.insert(Screen::Transaction, Box::new(Transaction::new()));
+        h.insert(Screen::EthTransaction, Box::new(EthTransaction::new()));
+        h.insert(Screen::SolTransaction, Box::new(SolTransaction::new()));
+        h.insert(Screen::Coin, Box::new(Coin::new()));
         h
     }
 }

@@ -1,4 +1,4 @@
-//! To add a token do 2 things:
+//! To add a token do 3 things:
 //! 1) add its address to the hashmap in get_token_addr
 //! 2) add its decimal places to the hashmap in get_token_decimals
 //! 3) add the json abi to src/eth/web3/tokens dir
@@ -107,7 +107,7 @@ pub async fn transfer_contract_private(
         )
         .await?;
 
-    println!("{}", result);
+    // println!("{}", result);
     Ok(result)
 }
 

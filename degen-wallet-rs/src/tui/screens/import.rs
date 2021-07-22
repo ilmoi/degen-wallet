@@ -127,9 +127,8 @@ impl Import<'_> {
         f.render_widget(p, body_chunk);
 
         import_and_save_mnemonic(state.mnemonic.as_ref().unwrap(), &self.passphrase);
-        state.screen = Screen::Accounts;
+        state.screen = Screen::Coin;
         self.import_state = ImportState::GetMnemonic; // in case we go through import twice
-        state.eth_accounts = (vec![], vec![], vec![]) //nullify existing accounts since we're gonna have new
     }
 }
 

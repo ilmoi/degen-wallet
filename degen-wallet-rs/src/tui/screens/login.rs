@@ -86,7 +86,7 @@ impl Login<'_> {
         match decrypt_keystore_file(&self.input) {
             Ok(mnemonic) => {
                 state.mnemonic = Some(mnemonic);
-                state.screen = Screen::Accounts;
+                state.screen = Screen::Coin;
             }
             Err(_) => {
                 self.msg.push(Span::styled(

@@ -15,6 +15,7 @@ secp256k1 = "0.20.3"
 bitcoin = "0.26.2"
 sha3 = "0.9.1"
 eth_checksum = "0.1.2"
+ed25519-dalek = "1.0.1"
 
 #tui
 termion = "1.5.6"
@@ -26,8 +27,16 @@ hex = "0.4.3"
 rand = { version="0.7"} # need 0.7 for eth-keystore to work ok. Might change in future versions ofc.
 tokio = { version="1.8.0", features=["full"] }
 anyhow = "1.0.41"
-web3 = "0.16.0"
 serde_json = "1.0.64"
 serde_bytes = "0.11.5"
 #lazy_static = "1.4.0"
 #async-trait = "0.1.50"
+
+# eth
+web3 = "0.16.0"
+
+# sol
+solana-sdk = "1.7.6"
+solana-client = "1.7.6"
+spl-associated-token-account = { version = "1.0.2", features = ["no-entrypoint"] }
+spl-token = "3.1.1"
